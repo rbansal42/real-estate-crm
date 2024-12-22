@@ -12,6 +12,8 @@ export const ROUTES = {
   },
   DASHBOARD: '/dashboard',
   PROPERTIES: '/properties',
+  PARTNERS: '/partners',
+  LISTINGS: '/listings',
   LEADS: '/leads',
   CLIENTS: '/clients',
 };
