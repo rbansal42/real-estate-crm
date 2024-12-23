@@ -1,4 +1,5 @@
 import { Property } from "@/types";
+import { Lead } from "@/schemas/lead.schema";
 
 export const dummyProperties: Property[] = [
   {
@@ -81,5 +82,95 @@ export const dummyProperties: Property[] = [
     ],
     createdAt: "2024-03-13T09:15:00Z",
     updatedAt: "2024-03-13T09:15:00Z"
+  }
+];
+
+export const dummyLeads: Lead[] = [
+  {
+    id: "1",
+    name: "Alice Brown",
+    email: "alice@example.com",
+    phone: "+91 98765 43210",
+    status: "active",
+    source: "website",
+    assignedTo: "1",
+    propertyInterest: ["1", "2"],
+    notes: [
+      {
+        id: "n1",
+        content: "Initial inquiry about 3BHK properties",
+        createdAt: "2024-03-20T10:00:00Z",
+        createdBy: "1"
+      }
+    ],
+    lastContact: "2024-03-20T10:00:00Z",
+    nextFollowup: "2024-03-25T10:00:00Z",
+    budget: {
+      min: 5000000,
+      max: 8000000
+    },
+    requirements: {
+      propertyType: ["apartment"],
+      location: ["Andheri", "Bandra"],
+      minBedrooms: 3,
+      minBathrooms: 2,
+      minArea: 1200
+    },
+    createdAt: "2024-03-20T10:00:00Z",
+    updatedAt: "2024-03-20T10:00:00Z"
+  },
+  {
+    id: "2",
+    name: "Bob Wilson",
+    email: "bob@example.com",
+    phone: "+91 98765 43211",
+    status: "pending",
+    source: "partner_referral",
+    assignedTo: "2",
+    propertyInterest: ["3"],
+    notes: [
+      {
+        id: "n2",
+        content: "Looking for commercial space",
+        createdAt: "2024-03-19T14:00:00Z",
+        createdBy: "2"
+      }
+    ],
+    lastContact: "2024-03-19T14:00:00Z",
+    nextFollowup: "2024-03-22T14:00:00Z",
+    budget: {
+      min: 40000000,
+      max: 50000000
+    },
+    requirements: {
+      propertyType: ["commercial"],
+      location: ["Business Hub"],
+      minArea: 4000
+    },
+    createdAt: "2024-03-19T14:00:00Z",
+    updatedAt: "2024-03-19T14:00:00Z"
+  },
+  {
+    id: "3",
+    name: "Charlie Davis",
+    email: "charlie@example.com",
+    phone: "+91 98765 43212",
+    status: "new",
+    source: "mobile_app",
+    propertyInterest: [],
+    notes: [],
+    budget: {
+      min: 10000000,
+      max: 15000000
+    },
+    requirements: {
+      propertyType: ["villa", "house"],
+      location: ["Powai", "Juhu"],
+      minBedrooms: 4,
+      minBathrooms: 3,
+      minArea: 2000
+    },
+    createdAt: "2024-03-21T09:00:00Z",
+    updatedAt: "2024-03-21T09:00:00Z"
   }
 ]; 
