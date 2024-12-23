@@ -22,6 +22,7 @@ import {
   DropdownItem,
   Selection,
   Checkbox,
+  SortDescriptor,
 } from '@nextui-org/react';
 import {
   PlusIcon,
@@ -48,6 +49,10 @@ export default function LeadsPage() {
   const [dateRange, setDateRange] = useState<Selection>(new Set(["all"]));
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLeads, setSelectedLeads] = useState<Selection>(new Set([]));
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    column: "lead",
+    direction: "ascending",
+  });
 
   // Calculate lead statistics
   const leadStats = {
@@ -66,9 +71,10 @@ export default function LeadsPage() {
     closed: "default",
   };
 
-  // Filter leads based on selected filters
-  const filteredLeads = useMemo(() => {
-    return dummyLeads.filter(lead => {
+  // Filter and sort leads
+  const sortedAndFilteredLeads = useMemo(() => {
+    // First filter the leads
+    const filtered = dummyLeads.filter(lead => {
       const matchesSearch = searchQuery === "" || 
         lead.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         lead.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -105,15 +111,62 @@ export default function LeadsPage() {
 
       return matchesSearch && matchesStatus && matchesSource && matchesAgent && matchesDate;
     });
-  }, [searchQuery, selectedStatus, selectedSource, selectedAgent, dateRange]);
+
+    // Then sort the filtered results
+    return [...filtered].sort((a, b) => {
+      let first: string | number;
+      let second: string | number;
+
+      // Handle special cases for complex columns
+      switch (sortDescriptor.column) {
+        case "lead":
+          first = a.name;
+          second = b.name;
+          break;
+        case "contact":
+          first = a.email;
+          second = b.email;
+          break;
+        case "lastActivity":
+          first = new Date(a.lastContact || "").getTime();
+          second = new Date(b.lastContact || "").getTime();
+          break;
+        case "propertyInterest":
+          first = a.propertyInterest.length;
+          second = b.propertyInterest.length;
+          break;
+        case "status":
+          first = a.status;
+          second = b.status;
+          break;
+        case "assignedTo":
+          first = a.assignedTo || "";
+          second = b.assignedTo || "";
+          break;
+        default:
+          first = "";
+          second = "";
+      }
+
+      if (typeof first === 'string' && typeof second === 'string') {
+        return sortDescriptor.direction === "descending" 
+          ? second.localeCompare(first)
+          : first.localeCompare(second);
+      }
+
+      return sortDescriptor.direction === "descending"
+        ? Number(second) - Number(first)
+        : Number(first) - Number(second);
+    });
+  }, [searchQuery, selectedStatus, selectedSource, selectedAgent, dateRange, sortDescriptor]);
 
   const columns = [
-    { name: "LEAD", uid: "lead" },
-    { name: "CONTACT INFO", uid: "contact" },
-    { name: "PROPERTY INTEREST", uid: "propertyInterest" },
-    { name: "STATUS", uid: "status" },
-    { name: "ASSIGNED TO", uid: "assignedTo" },
-    { name: "LAST ACTIVITY", uid: "lastActivity" },
+    { name: "LEAD", uid: "lead", sortable: true },
+    { name: "CONTACT INFO", uid: "contact", sortable: true },
+    { name: "PROPERTY INTEREST", uid: "propertyInterest", sortable: true },
+    { name: "STATUS", uid: "status", sortable: true },
+    { name: "ASSIGNED TO", uid: "assignedTo", sortable: true },
+    { name: "LAST ACTIVITY", uid: "lastActivity", sortable: true },
     { name: "ACTIONS", uid: "actions", width: "130px" },
   ];
 
@@ -382,6 +435,8 @@ export default function LeadsPage() {
               selectionMode="multiple"
               selectedKeys={selectedLeads}
               onSelectionChange={setSelectedLeads as any}
+              sortDescriptor={sortDescriptor}
+              onSortChange={setSortDescriptor as any}
             >
               <TableHeader columns={columns}>
                 {(column) => (
@@ -389,12 +444,13 @@ export default function LeadsPage() {
                     key={column.uid}
                     align={column.uid === "actions" ? "center" : "start"}
                     width={column.width as any}
+                    allowsSorting={column.sortable}
                   >
                     {column.name}
                   </TableColumn>
                 )}
               </TableHeader>
-              <TableBody items={filteredLeads}>
+              <TableBody items={sortedAndFilteredLeads}>
                 {(lead) => (
                   <TableRow key={lead.id}>
                     {(columnKey) => (
