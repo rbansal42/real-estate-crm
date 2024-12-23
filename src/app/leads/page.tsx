@@ -128,14 +128,10 @@ export default function LeadsPage() {
     switch (columnKey) {
       case "lead":
         return (
-          <User
-            name={lead.name}
-            description={`Budget: ₹${lead.budget.min / 100000}L - ₹${lead.budget.max / 100000}L`}
-            avatarProps={{
-              radius: "full",
-              src: `https://i.pravatar.cc/150?u=${lead.id}`,
-            }}
-          />
+          <div className="flex flex-col">
+            <span className="text-sm font-medium">{lead.name}</span>
+            <span className="text-xs text-default-500">Budget: ₹{lead.budget.min / 100000}L - ₹{lead.budget.max / 100000}L</span>
+          </div>
         );
       case "contact":
         return (
@@ -165,14 +161,7 @@ export default function LeadsPage() {
         );
       case "assignedTo":
         return lead.assignedTo ? (
-          <User
-            name={`Agent #${lead.assignedTo}`}
-            avatarProps={{
-              radius: "full",
-              size: "sm",
-              src: `https://i.pravatar.cc/150?u=agent${lead.assignedTo}`,
-            }}
-          />
+          <span className="text-sm">Agent #{lead.assignedTo}</span>
         ) : (
           <Chip size="sm" variant="flat">Unassigned</Chip>
         );
