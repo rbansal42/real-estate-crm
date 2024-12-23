@@ -16,7 +16,7 @@ export const usePropertyForm = () => {
         bedrooms: 0,
         bathrooms: 0,
         area: 0,
-        yearBuilt: new Date().getFullYear(),
+        parking: 0,
       },
     },
   });
