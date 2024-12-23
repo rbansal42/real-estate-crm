@@ -161,13 +161,62 @@ export default function LeadsPage() {
   }, [searchQuery, selectedStatus, selectedSource, selectedAgent, dateRange, sortDescriptor]);
 
   const columns = [
-    { name: "LEAD", uid: "lead", sortable: true },
-    { name: "CONTACT INFO", uid: "contact", sortable: true },
-    { name: "PROPERTY INTEREST", uid: "propertyInterest", sortable: true },
-    { name: "STATUS", uid: "status", sortable: true },
-    { name: "ASSIGNED TO", uid: "assignedTo", sortable: true },
-    { name: "LAST ACTIVITY", uid: "lastActivity", sortable: true },
-    { name: "ACTIONS", uid: "actions", width: "130px" },
+    { 
+      name: "LEAD", 
+      uid: "lead", 
+      sortable: true,
+    },
+    { 
+      name: "CONTACT INFO", 
+      uid: "contact", 
+      sortable: true,
+    },
+    { 
+      name: "PROPERTY INTEREST", 
+      uid: "propertyInterest", 
+      sortable: true,
+    },
+    { 
+      name: "STATUS", 
+      uid: "status", 
+      sortable: true,
+      filterOptions: [
+        { key: "all", label: "All Status" },
+        { key: "new", label: "New" },
+        { key: "active", label: "Active" },
+        { key: "pending", label: "Pending" },
+        { key: "booked", label: "Booked" },
+        { key: "not_interested", label: "Not Interested" },
+        { key: "closed", label: "Closed" },
+      ]
+    },
+    { 
+      name: "ASSIGNED TO", 
+      uid: "assignedTo", 
+      sortable: true,
+      filterOptions: [
+        { key: "all", label: "All Agents" },
+        { key: "1", label: "Agent #1" },
+        { key: "2", label: "Agent #2" },
+        { key: "unassigned", label: "Unassigned" },
+      ]
+    },
+    { 
+      name: "LAST ACTIVITY", 
+      uid: "lastActivity", 
+      sortable: true,
+      filterOptions: [
+        { key: "all", label: "All Time" },
+        { key: "today", label: "Today" },
+        { key: "week", label: "Last 7 Days" },
+        { key: "month", label: "Last 30 Days" },
+      ]
+    },
+    { 
+      name: "ACTIONS", 
+      uid: "actions", 
+      width: "130px" 
+    },
   ];
 
   const formatDate = (dateString?: string) => {
@@ -349,87 +398,53 @@ export default function LeadsPage() {
           </Card>
         </div>
 
-        {/* Search and Filters */}
-        <div className="flex flex-col gap-4">
-          <div className="flex gap-4">
-            <Input
-              placeholder="Search leads..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<MagnifyingGlassIcon className="w-4 h-4 text-default-400" />}
-              className="w-96"
-            />
-            <Button 
-              variant="flat" 
-              startContent={<FunnelIcon className="w-4 h-4" />}
-            >
-              More Filters
-            </Button>
-          </div>
-          
-          <div className="flex gap-4 flex-wrap">
-            <Select
-              label="Status"
-              placeholder="Filter by status"
-              selectedKeys={selectedStatus}
-              className="max-w-xs"
-              onSelectionChange={setSelectedStatus}
-            >
-              <SelectItem key="all" value="all">All Status</SelectItem>
-              <SelectItem key="new" value="new">New</SelectItem>
-              <SelectItem key="active" value="active">Active</SelectItem>
-              <SelectItem key="pending" value="pending">Pending</SelectItem>
-              <SelectItem key="booked" value="booked">Booked</SelectItem>
-              <SelectItem key="not_interested" value="not_interested">Not Interested</SelectItem>
-              <SelectItem key="closed" value="closed">Closed</SelectItem>
-            </Select>
-
-            <Select
-              label="Source"
-              placeholder="Filter by source"
-              selectedKeys={selectedSource}
-              className="max-w-xs"
-              onSelectionChange={setSelectedSource}
-            >
-              <SelectItem key="all" value="all">All Sources</SelectItem>
-              <SelectItem key="website" value="website">Website</SelectItem>
-              <SelectItem key="mobile_app" value="mobile_app">Mobile App</SelectItem>
-              <SelectItem key="direct_call" value="direct_call">Direct Call</SelectItem>
-              <SelectItem key="partner_referral" value="partner_referral">Partner Referral</SelectItem>
-              <SelectItem key="other" value="other">Other</SelectItem>
-            </Select>
-
-            <Select
-              label="Assigned To"
-              placeholder="Filter by agent"
-              selectedKeys={selectedAgent}
-              className="max-w-xs"
-              onSelectionChange={setSelectedAgent}
-            >
-              <SelectItem key="all" value="all">All Agents</SelectItem>
-              <SelectItem key="1" value="1">Agent #1</SelectItem>
-              <SelectItem key="2" value="2">Agent #2</SelectItem>
-              <SelectItem key="unassigned" value="unassigned">Unassigned</SelectItem>
-            </Select>
-
-            <Select
-              label="Date Range"
-              placeholder="Filter by date"
-              selectedKeys={dateRange}
-              className="max-w-xs"
-              onSelectionChange={setDateRange}
-            >
-              <SelectItem key="all" value="all">All Time</SelectItem>
-              <SelectItem key="today" value="today">Today</SelectItem>
-              <SelectItem key="week" value="week">Last 7 Days</SelectItem>
-              <SelectItem key="month" value="month">Last 30 Days</SelectItem>
-            </Select>
-          </div>
-        </div>
-
         {/* Leads Table */}
         <Card>
           <CardBody>
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex gap-3">
+                <Dropdown>
+                  <DropdownTrigger>
+                    <Button 
+                      variant="flat" 
+                      startContent={<FunnelIcon className="w-4 h-4" />}
+                    >
+                      Filters
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu aria-label="Filter options">
+                    <DropdownItem key="source">
+                      <Select
+                        label="Source"
+                        placeholder="Filter by source"
+                        selectedKeys={selectedSource}
+                        className="min-w-[200px]"
+                        onSelectionChange={setSelectedSource}
+                      >
+                        <SelectItem key="all" value="all">All Sources</SelectItem>
+                        <SelectItem key="website" value="website">Website</SelectItem>
+                        <SelectItem key="mobile_app" value="mobile_app">Mobile App</SelectItem>
+                        <SelectItem key="direct_call" value="direct_call">Direct Call</SelectItem>
+                        <SelectItem key="partner_referral" value="partner_referral">Partner Referral</SelectItem>
+                        <SelectItem key="other" value="other">Other</SelectItem>
+                      </Select>
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              </div>
+              <Input
+                placeholder="Search leads..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                startContent={<MagnifyingGlassIcon className="w-3.5 h-3.5 text-default-400" />}
+                size="sm"
+                className="w-64"
+                classNames={{
+                  input: "text-small",
+                  inputWrapper: "h-8",
+                }}
+              />
+            </div>
             <Table 
               aria-label="Leads table"
               selectionMode="multiple"
@@ -437,6 +452,7 @@ export default function LeadsPage() {
               onSelectionChange={setSelectedLeads as any}
               sortDescriptor={sortDescriptor}
               onSortChange={setSortDescriptor as any}
+              topContent={null}
             >
               <TableHeader columns={columns}>
                 {(column) => (
@@ -446,7 +462,33 @@ export default function LeadsPage() {
                     width={column.width as any}
                     allowsSorting={column.sortable}
                   >
-                    {column.name}
+                    <div className="flex items-center gap-2">
+                      {column.name}
+                      {column.filterOptions && (
+                        <Dropdown>
+                          <DropdownTrigger>
+                            <Button 
+                              isIconOnly
+                              size="sm"
+                              variant="light"
+                              className="ml-2 -mr-2"
+                            >
+                              <FunnelIcon className="w-3.5 h-3.5" />
+                            </Button>
+                          </DropdownTrigger>
+                          <DropdownMenu aria-label={`Filter ${column.name}`}>
+                            {column.filterOptions.map((option) => (
+                              <DropdownItem 
+                                key={option.key}
+                                className="capitalize"
+                              >
+                                {option.label}
+                              </DropdownItem>
+                            ))}
+                          </DropdownMenu>
+                        </Dropdown>
+                      )}
+                    </div>
                   </TableColumn>
                 )}
               </TableHeader>
