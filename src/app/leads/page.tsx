@@ -38,8 +38,10 @@ import {
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import { dummyLeads } from '@/constants/dummyData';
 import type { Lead } from '@/schemas/lead.schema';
+import { useRouter } from 'next/navigation';
 
 export default function LeadsPage() {
+  const router = useRouter();
   const [selectedStatus, setSelectedStatus] = useState<Selection>(new Set(["all"]));
   const [selectedSource, setSelectedSource] = useState<Selection>(new Set(["all"]));
   const [selectedAgent, setSelectedAgent] = useState<Selection>(new Set(["all"]));
@@ -124,6 +126,10 @@ export default function LeadsPage() {
     });
   };
 
+  const handleViewLead = (leadId: string) => {
+    router.push(`/leads/${leadId}`);
+  };
+
   const renderCell = (lead: Lead, columnKey: React.Key) => {
     switch (columnKey) {
       case "lead":
@@ -180,6 +186,7 @@ export default function LeadsPage() {
               size="sm"
               variant="flat"
               aria-label="View lead"
+              onClick={() => handleViewLead(lead.id)}
             >
               <EyeIcon className="w-4 h-4" />
             </Button>
