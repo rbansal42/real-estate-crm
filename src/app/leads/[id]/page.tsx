@@ -10,7 +10,6 @@ import {
   Tabs,
   Tab,
   Divider,
-  Avatar,
   Textarea,
   Input,
   Modal,
@@ -32,8 +31,6 @@ import {
   CheckCircleIcon,
   ArrowPathIcon,
   PlusIcon,
-  UserGroupIcon,
-  XMarkIcon,
 } from '@heroicons/react/24/outline';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import { dummyLeads } from '@/constants/dummyData';
@@ -87,11 +84,6 @@ export default function LeadDetailsPage() {
     return format(new Date(dateString), 'MMM d, yyyy');
   };
 
-  const formatDateTime = (dateString?: string) => {
-    if (!dateString) return '-';
-    return format(new Date(dateString), 'MMM d, yyyy h:mm a');
-  };
-
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -122,6 +114,10 @@ export default function LeadDetailsPage() {
     // TODO: Implement interaction save
     console.log('New Interaction:', interaction);
     setIsInteractionModalOpen(false);
+  };
+
+  const onTabChange = (key: string | number) => {
+    setSelectedTab(key.toString());
   };
 
   return (
@@ -169,7 +165,7 @@ export default function LeadDetailsPage() {
         {/* Main Content */}
         <Tabs 
           selectedKey={selectedTab} 
-          onSelectionChange={setSelectedTab as any}
+          onSelectionChange={onTabChange}
         >
           <Tab
             key="overview"

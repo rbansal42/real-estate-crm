@@ -3,7 +3,6 @@ import {
   HomeIcon, 
   BuildingOfficeIcon, 
   UserGroupIcon,
-  BuildingLibraryIcon,
   UsersIcon,
   ClipboardDocumentListIcon,
   TableCellsIcon,

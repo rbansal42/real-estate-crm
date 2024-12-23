@@ -41,6 +41,18 @@ import { dummyLeads } from '@/constants/dummyData';
 import type { Lead } from '@/schemas/lead.schema';
 import { useRouter } from 'next/navigation';
 
+// Define column types
+type ColumnKey = "lead" | "contact" | "propertyInterest" | "status" | "assignedTo" | "lastActivity" | "actions";
+
+// Add type for TableColumn
+type TableColumnType = {
+  name: string;
+  uid: ColumnKey;
+  sortable?: boolean;
+  width?: string;
+  filterOptions?: Array<{ key: string; label: string; }>;
+};
+
 export default function LeadsPage() {
   const router = useRouter();
   const [selectedStatus, setSelectedStatus] = useState<Selection>(new Set(["all"]));
@@ -160,7 +172,7 @@ export default function LeadsPage() {
     });
   }, [searchQuery, selectedStatus, selectedSource, selectedAgent, dateRange, sortDescriptor]);
 
-  const columns = [
+  const columns: TableColumnType[] = [
     { 
       name: "LEAD", 
       uid: "lead", 
@@ -232,7 +244,7 @@ export default function LeadsPage() {
     router.push(`/leads/${leadId}`);
   };
 
-  const renderCell = (lead: Lead, columnKey: React.Key) => {
+  const renderCell = (lead: Lead, columnKey: ColumnKey) => {
     switch (columnKey) {
       case "lead":
         return (
@@ -325,6 +337,26 @@ export default function LeadsPage() {
   };
 
   const selectedCount = Array.from(selectedLeads).length;
+
+  const onSelectionChange = (keys: Selection) => {
+    setSelectedLeads(keys);
+  };
+
+  const onSortChange = (descriptor: SortDescriptor) => {
+    setSortDescriptor(descriptor);
+  };
+
+  const onStatusChange = (keys: Selection) => {
+    setSelectedStatus(keys);
+  };
+
+  const onAgentChange = (keys: Selection) => {
+    setSelectedAgent(keys);
+  };
+
+  const onDateRangeChange = (keys: Selection) => {
+    setDateRange(keys);
+  };
 
   return (
     <DashboardLayout>
@@ -419,7 +451,7 @@ export default function LeadsPage() {
                         placeholder="Filter by source"
                         selectedKeys={selectedSource}
                         className="min-w-[200px]"
-                        onSelectionChange={setSelectedSource}
+                        onSelectionChange={onStatusChange}
                       >
                         <SelectItem key="all" value="all">All Sources</SelectItem>
                         <SelectItem key="website" value="website">Website</SelectItem>
@@ -449,9 +481,9 @@ export default function LeadsPage() {
               aria-label="Leads table"
               selectionMode="multiple"
               selectedKeys={selectedLeads}
-              onSelectionChange={setSelectedLeads as any}
+              onSelectionChange={onSelectionChange}
               sortDescriptor={sortDescriptor}
-              onSortChange={setSortDescriptor as any}
+              onSortChange={onSortChange}
               topContent={null}
             >
               <TableHeader columns={columns}>
@@ -497,7 +529,7 @@ export default function LeadsPage() {
                   <TableRow key={lead.id}>
                     {(columnKey) => (
                       <TableCell>
-                        {renderCell(lead, columnKey)}
+                        {renderCell(lead, columnKey as ColumnKey)}
                       </TableCell>
                     )}
                   </TableRow>
