@@ -16,7 +16,6 @@ import {
   Pagination,
   Selection,
   SortDescriptor,
-  Tooltip,
   User,
 } from "@nextui-org/react";
 import { 
@@ -25,51 +24,47 @@ import {
   TrashIcon, 
   EyeIcon,
   PhotoIcon,
-  ArrowUpIcon,
-  ArrowDownIcon,
 } from "@heroicons/react/24/outline";
-import { useProperties } from "@/hooks/useProperties";
 import { useState, useMemo } from "react";
 import { Property } from "@/types";
-import Image from "next/image";
 
-const statusColorMap = {
+const statusColorMap: Record<string, "success" | "danger" | "warning" | "primary"> = {
   available: "success",
   sold: "danger",
   rented: "warning",
   pending: "primary",
 };
 
-export default function PropertyTable() {
-  const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: "createdAt",
-    direction: "descending",
-  });
+type ColumnKey = "title" | "type" | "location" | "price" | "status" | "actions";
+
+interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+interface PropertyTableProps {
+  properties: Property[];
+}
+
+export default function PropertyTable({ properties }: PropertyTableProps) {
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
-
-  const { data, isLoading } = useProperties({
-    page,
-    limit: rowsPerPage,
-    sort: sortDescriptor.column,
-    order: sortDescriptor.direction,
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    column: "title",
+    direction: "ascending",
   });
-
-  const properties = data?.items || [];
-  const total = data?.total || 0;
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const sortedProperties = useMemo(() => {
     return [...properties].sort((a, b) => {
       const first = a[sortDescriptor.column as keyof Property];
       const second = b[sortDescriptor.column as keyof Property];
-      if (sortDescriptor.direction === "ascending") {
-        return first < second ? -1 : 1;
-      } else {
-        return first > second ? -1 : 1;
-      }
+      const cmp = first < second ? -1 : 1;
+
+      return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
-  }, [properties, sortDescriptor]);
+  }, [sortDescriptor, properties]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -88,7 +83,7 @@ export default function PropertyTable() {
     { name: "ACTIONS", uid: "actions" },
   ];
 
-  const renderCell = (property: Property, columnKey: React.Key) => {
+  const renderCell = (property: Property, columnKey: ColumnKey) => {
     switch (columnKey) {
       case "title":
         return (
@@ -96,6 +91,7 @@ export default function PropertyTable() {
             avatarProps={{
               src: property.images[0],
               icon: <PhotoIcon className="w-4 h-4" />,
+              alt: property.title,
             }}
             name={property.title}
             description={`${property.specifications.bedrooms} beds • ${property.specifications.bathrooms} baths`}
@@ -122,18 +118,19 @@ export default function PropertyTable() {
           <div className="flex justify-end">
             <Dropdown>
               <DropdownTrigger>
-                <Button isIconOnly variant="light">
+                <Button isIconOnly variant="light" aria-label="More actions">
                   <EllipsisVerticalIcon className="w-5 h-5" />
                 </Button>
               </DropdownTrigger>
-              <DropdownMenu>
-                <DropdownItem startContent={<EyeIcon className="w-4 h-4" />}>
+              <DropdownMenu aria-label="Property actions">
+                <DropdownItem key="view" startContent={<EyeIcon className="w-4 h-4" />}>
                   View Details
                 </DropdownItem>
-                <DropdownItem startContent={<PencilIcon className="w-4 h-4" />}>
+                <DropdownItem key="edit" startContent={<PencilIcon className="w-4 h-4" />}>
                   Edit
                 </DropdownItem>
                 <DropdownItem 
+                  key="delete"
                   startContent={<TrashIcon className="w-4 h-4" />}
                   className="text-danger"
                   color="danger"
@@ -144,48 +141,68 @@ export default function PropertyTable() {
             </Dropdown>
           </div>
         );
-      default:
-        return null;
     }
   };
 
+  const handleRowsPerPageChange = (value: number) => {
+    setRowsPerPage(value);
+  };
+
   return (
-    <Table
-      aria-label="Properties table"
-      isHeaderSticky
-      selectionMode="multiple"
-      selectedKeys={selectedKeys}
-      onSelectionChange={setSelectedKeys}
-      sortDescriptor={sortDescriptor}
-      onSortChange={setSortDescriptor}
-      classNames={{
-        wrapper: "max-h-[600px]",
-      }}
-    >
-      <TableHeader columns={columns}>
-        {(column) => (
-          <TableColumn 
-            key={column.uid}
-            align={column.uid === "actions" ? "center" : "start"}
-            allowsSorting={column.sortable}
-          >
-            {column.name}
-          </TableColumn>
-        )}
-      </TableHeader>
-      <TableBody 
-        items={sortedProperties}
-        isLoading={isLoading}
-        loadingContent={<div>Loading properties...</div>}
+    <div className="space-y-4">
+      <Table
+        aria-label="Properties table"
+        isHeaderSticky
+        selectionMode="multiple"
+        selectedKeys={selectedKeys}
+        onSelectionChange={setSelectedKeys}
+        sortDescriptor={sortDescriptor}
+        onSortChange={setSortDescriptor}
+        classNames={{
+          wrapper: "max-h-[600px]",
+        }}
       >
-        {(property) => (
-          <TableRow key={property.id}>
-            {(columnKey) => (
-              <TableCell>{renderCell(property, columnKey)}</TableCell>
-            )}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+        <TableHeader columns={columns}>
+          {(column) => (
+            <TableColumn 
+              key={column.uid}
+              align={column.uid === "actions" ? "center" : "start"}
+              allowsSorting={column.sortable}
+            >
+              {column.name}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody 
+          items={sortedProperties}
+          emptyContent={!sortedProperties.length && "No properties found"}
+        >
+          {(property) => (
+            <TableRow key={property.id}>
+              {(columnKey) => (
+                <TableCell>
+                  {renderCell(property, columnKey as ColumnKey)}
+                </TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+
+      <div className="flex justify-between items-center">
+        <div className="text-small text-default-400">
+          Total {properties.length} properties
+        </div>
+        <Pagination
+          total={Math.ceil(properties.length / rowsPerPage)}
+          page={1}
+          onChange={() => {}}
+          showControls
+          classNames={{
+            wrapper: "gap-2",
+          }}
+        />
+      </div>
+    </div>
   );
 } 

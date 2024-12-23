@@ -16,6 +16,7 @@ export const ROUTES = {
   LISTINGS: '/listings',
   LEADS: '/leads',
   CLIENTS: '/clients',
+  SETTINGS: '/settings',
 };
 
 export const API_ENDPOINTS = {

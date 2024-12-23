@@ -11,7 +11,7 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@nextui-org/react";
-import { FunnelIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { FunnelIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 
 const propertyTypes = [
@@ -40,7 +40,9 @@ export default function PropertyFilters() {
 
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
 
-  const handleFilterChange = (key: string, value: any) => {
+  type FilterValue = string | Set<string> | number[] | string[];
+
+  const handleFilterChange = (key: string, value: FilterValue) => {
     setFilters(prev => ({ ...prev, [key]: value }));
     if (!activeFilters.includes(key)) {
       setActiveFilters(prev => [...prev, key]);

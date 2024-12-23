@@ -8,6 +8,7 @@ import DashboardLayout from "@/components/layouts/DashboardLayout";
 import PropertyTable from "@/components/properties/PropertyTable";
 import PropertyGrid from "@/components/properties/PropertyGrid";
 import PropertyFilters from "@/components/properties/PropertyFilters";
+import { dummyProperties } from "@/constants/dummyData";
 
 export default function PropertiesPage() {
   const searchParams = useSearchParams();
@@ -21,14 +22,14 @@ export default function PropertiesPage() {
           <ButtonGroup variant="flat">
             <Button
               isIconOnly
-              onClick={() => setView("table")}
+              onPress={() => setView("table")}
               className={view === "table" ? "bg-primary/20" : ""}
             >
               <TableCellsIcon className="w-5 h-5" />
             </Button>
             <Button
               isIconOnly
-              onClick={() => setView("card")}
+              onPress={() => setView("card")}
               className={view === "card" ? "bg-primary/20" : ""}
             >
               <Squares2X2Icon className="w-5 h-5" />
@@ -38,7 +39,10 @@ export default function PropertiesPage() {
 
         <PropertyFilters />
         
-        {view === "table" ? <PropertyTable /> : <PropertyGrid />}
+        {view === "table" ? 
+          <PropertyTable properties={dummyProperties} /> : 
+          <PropertyGrid properties={dummyProperties} />
+        }
       </div>
     </DashboardLayout>
   );
