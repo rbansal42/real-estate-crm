@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardBody, Tab, Tabs } from "@nextui-org/react";
+import { Tabs, Tab } from "@nextui-org/react";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { useAuthStore } from "@/store/useAuthStore";
 import CompanySettings from "@/components/settings/CompanySettings";

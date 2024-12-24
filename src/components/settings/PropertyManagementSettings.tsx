@@ -43,12 +43,12 @@ interface Tag {
 }
 
 export default function PropertyManagementSettings() {
-  const [categories, setCategories] = useState<Category[]>([
+  const [categories] = useState<Category[]>([
     { id: '1', name: 'Residential', description: 'Houses and apartments', count: 120 },
     { id: '2', name: 'Commercial', description: 'Office spaces and shops', count: 36 },
   ]);
 
-  const [tags, setTags] = useState<Tag[]>([
+  const [tags] = useState<Tag[]>([
     { id: '1', name: 'Under Construction', color: 'warning', count: 45 },
     { id: '2', name: 'Ready to Move', color: 'success', count: 89 },
     { id: '3', name: 'New Launch', color: 'primary', count: 22 },
@@ -62,36 +62,40 @@ export default function PropertyManagementSettings() {
     { name: "ACTIONS", uid: "actions" },
   ];
 
-  const renderCell = (item: Category, columnKey: React.Key) => {
-    switch (columnKey) {
-      case "actions":
-        return (
-          <div className="flex justify-end">
-            <Dropdown>
-              <DropdownTrigger>
-                <Button isIconOnly variant="light">
-                  <EllipsisVerticalIcon className="w-5 h-5" />
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu>
-                <DropdownItem key="edit" startContent={<PencilIcon className="w-4 h-4" />}>
-                  Edit
-                </DropdownItem>
-                <DropdownItem 
-                  key="delete"
-                  startContent={<TrashIcon className="w-4 h-4" />}
-                  className="text-danger"
-                  color="danger"
-                >
-                  Delete
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </div>
-        );
-      default:
-        return item[columnKey as keyof Category];
+  const renderCell = (item: Category | Tag, columnKey: string) => {
+    if (columnKey === "actions") {
+      return (
+        <div className="flex justify-end">
+          <Dropdown>
+            <DropdownTrigger>
+              <Button isIconOnly variant="light">
+                <EllipsisVerticalIcon className="w-5 h-5" />
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu>
+              <DropdownItem key="edit" startContent={<PencilIcon className="w-4 h-4" />}>
+                Edit
+              </DropdownItem>
+              <DropdownItem 
+                key="delete"
+                startContent={<TrashIcon className="w-4 h-4" />}
+                className="text-danger"
+                color="danger"
+              >
+                Delete
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        </div>
+      );
     }
+    
+    // Check if the item is a Category
+    if ('description' in item) {
+      return item[columnKey as keyof Category];
+    }
+    // If it's a Tag
+    return item[columnKey as keyof Tag];
   };
 
   return (
@@ -135,7 +139,7 @@ export default function PropertyManagementSettings() {
               {(category) => (
                 <TableRow key={category.id}>
                   {(columnKey) => (
-                    <TableCell>{renderCell(category, columnKey)}</TableCell>
+                    <TableCell>{renderCell(category, columnKey.toString())}</TableCell>
                   )}
                 </TableRow>
               )}
@@ -160,7 +164,7 @@ export default function PropertyManagementSettings() {
             {tags.map((tag) => (
               <Chip
                 key={tag.id}
-                color={tag.color as any}
+                color={tag.color}
                 variant="flat"
                 onClose={() => {}}
                 classNames={{

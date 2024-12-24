@@ -17,6 +17,8 @@ import {
   Selection,
   SortDescriptor,
   User,
+  Select,
+  SelectItem,
 } from "@nextui-org/react";
 import { 
   EllipsisVerticalIcon, 
@@ -36,13 +38,6 @@ const statusColorMap: Record<string, "success" | "danger" | "warning" | "primary
 };
 
 type ColumnKey = "title" | "type" | "location" | "price" | "status" | "actions";
-
-interface PaginatedResponse<T> {
-  items: T[];
-  total: number;
-  page: number;
-  limit: number;
-}
 
 interface PropertyTableProps {
   properties: Property[];
@@ -144,7 +139,8 @@ export default function PropertyTable({ properties }: PropertyTableProps) {
     }
   };
 
-  const handleRowsPerPageChange = (value: number) => {
+  const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = parseInt(e.target.value);
     setRowsPerPage(value);
   };
 
@@ -193,15 +189,27 @@ export default function PropertyTable({ properties }: PropertyTableProps) {
         <div className="text-small text-default-400">
           Total {properties.length} properties
         </div>
-        <Pagination
-          total={Math.ceil(properties.length / rowsPerPage)}
-          page={1}
-          onChange={() => {}}
-          showControls
-          classNames={{
-            wrapper: "gap-2",
-          }}
-        />
+        <div className="flex items-center gap-4">
+          <Select
+            label="Rows per page"
+            className="w-32"
+            onChange={handleRowsPerPageChange}
+            defaultSelectedKeys={[rowsPerPage.toString()]}
+          >
+            <SelectItem key="10" value="10">10</SelectItem>
+            <SelectItem key="20" value="20">20</SelectItem>
+            <SelectItem key="50" value="50">50</SelectItem>
+          </Select>
+          <Pagination
+            total={Math.ceil(properties.length / rowsPerPage)}
+            page={1}
+            onChange={() => {}}
+            showControls
+            classNames={{
+              wrapper: "gap-2",
+            }}
+          />
+        </div>
       </div>
     </div>
   );

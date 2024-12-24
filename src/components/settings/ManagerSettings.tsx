@@ -1,6 +1,4 @@
 import {
-  Card,
-  CardBody,
   Tabs,
   Tab,
 } from "@nextui-org/react";
@@ -8,7 +6,6 @@ import TeamManagementSettings from "./manager/TeamManagementSettings";
 import LeadManagementSettings from "./manager/LeadManagementSettings";
 import PropertyManagementSettings from "./manager/PropertyManagementSettings";
 import NotificationSettings from "./manager/NotificationSettings";
-import ReportSettings from "./manager/ReportSettings";
 
 export default function ManagerSettings() {
   return (
@@ -49,13 +46,6 @@ export default function ManagerSettings() {
           className="px-0"
         >
           <NotificationSettings />
-        </Tab>
-        <Tab 
-          key="reports" 
-          title="Reports"
-          className="px-0"
-        >
-          <ReportSettings />
         </Tab>
       </Tabs>
     </div>

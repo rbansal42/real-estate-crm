@@ -13,7 +13,6 @@ import {
   TableColumn,
   TableRow,
   TableCell,
-  User,
   Chip,
   Input,
   Dropdown,
@@ -21,7 +20,6 @@ import {
   DropdownMenu,
   DropdownItem,
   Selection,
-  Checkbox,
   SortDescriptor,
 } from '@nextui-org/react';
 import {
@@ -49,14 +47,14 @@ type TableColumnType = {
   name: string;
   uid: ColumnKey;
   sortable?: boolean;
-  width?: string;
+  width?: number;
   filterOptions?: Array<{ key: string; label: string; }>;
 };
 
 export default function LeadsPage() {
   const router = useRouter();
   const [selectedStatus, setSelectedStatus] = useState<Selection>(new Set(["all"]));
-  const [selectedSource, setSelectedSource] = useState<Selection>(new Set(["all"]));
+  const [selectedSource] = useState<Selection>(new Set(["all"]));
   const [selectedAgent, setSelectedAgent] = useState<Selection>(new Set(["all"]));
   const [dateRange, setDateRange] = useState<Selection>(new Set(["all"]));
   const [searchQuery, setSearchQuery] = useState("");
@@ -227,7 +225,7 @@ export default function LeadsPage() {
     { 
       name: "ACTIONS", 
       uid: "actions", 
-      width: "130px" 
+      width: 130
     },
   ];
 
@@ -352,10 +350,20 @@ export default function LeadsPage() {
 
   const onAgentChange = (keys: Selection) => {
     setSelectedAgent(keys);
+    // Add filtering logic here
+    console.log('Agent filter changed:', keys);
   };
 
   const onDateRangeChange = (keys: Selection) => {
     setDateRange(keys);
+    // Add date filtering logic here
+    console.log('Date range changed:', keys);
+  };
+
+  const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = parseInt(e.target.value);
+    // Add pagination logic here
+    console.log('Rows per page changed:', value);
   };
 
   return (
@@ -445,22 +453,53 @@ export default function LeadsPage() {
                     </Button>
                   </DropdownTrigger>
                   <DropdownMenu aria-label="Filter options">
-                    <DropdownItem key="source">
-                      <Select
-                        label="Source"
-                        placeholder="Filter by source"
-                        selectedKeys={selectedSource}
-                        className="min-w-[200px]"
-                        onSelectionChange={onStatusChange}
-                      >
-                        <SelectItem key="all" value="all">All Sources</SelectItem>
-                        <SelectItem key="website" value="website">Website</SelectItem>
-                        <SelectItem key="mobile_app" value="mobile_app">Mobile App</SelectItem>
-                        <SelectItem key="direct_call" value="direct_call">Direct Call</SelectItem>
-                        <SelectItem key="partner_referral" value="partner_referral">Partner Referral</SelectItem>
-                        <SelectItem key="other" value="other">Other</SelectItem>
-                      </Select>
-                    </DropdownItem>
+                    <Select
+                      label="Source"
+                      placeholder="Filter by source"
+                      selectedKeys={selectedSource}
+                      className="min-w-[200px]"
+                      onSelectionChange={onStatusChange}
+                    >
+                      <SelectItem key="all" value="all">All Sources</SelectItem>
+                      <SelectItem key="website" value="website">Website</SelectItem>
+                      <SelectItem key="mobile_app" value="mobile_app">Mobile App</SelectItem>
+                      <SelectItem key="direct_call" value="direct_call">Direct Call</SelectItem>
+                      <SelectItem key="partner_referral" value="partner_referral">Partner Referral</SelectItem>
+                      <SelectItem key="other" value="other">Other</SelectItem>
+                    </Select>
+                    <Select
+                      label="Assigned To"
+                      placeholder="Filter by agent"
+                      selectedKeys={selectedAgent}
+                      className="min-w-[200px]"
+                      onSelectionChange={onAgentChange}
+                    >
+                      <SelectItem key="all" value="all">All Agents</SelectItem>
+                      <SelectItem key="1" value="1">Agent #1</SelectItem>
+                      <SelectItem key="2" value="2">Agent #2</SelectItem>
+                      <SelectItem key="unassigned" value="unassigned">Unassigned</SelectItem>
+                    </Select>
+                    <Select
+                      label="Date Range"
+                      placeholder="Filter by date"
+                      selectedKeys={dateRange}
+                      className="min-w-[200px]"
+                      onSelectionChange={onDateRangeChange}
+                    >
+                      <SelectItem key="all" value="all">All Time</SelectItem>
+                      <SelectItem key="today" value="today">Today</SelectItem>
+                      <SelectItem key="week" value="week">Last 7 Days</SelectItem>
+                      <SelectItem key="month" value="month">Last 30 Days</SelectItem>
+                    </Select>
+                    <Select
+                      label="Rows per page"
+                      className="w-32"
+                      onChange={handleRowsPerPageChange}
+                    >
+                      <SelectItem key="10" value="10">10</SelectItem>
+                      <SelectItem key="20" value="20">20</SelectItem>
+                      <SelectItem key="50" value="50">50</SelectItem>
+                    </Select>
                   </DropdownMenu>
                 </Dropdown>
               </div>
@@ -491,36 +530,10 @@ export default function LeadsPage() {
                   <TableColumn 
                     key={column.uid}
                     align={column.uid === "actions" ? "center" : "start"}
-                    width={column.width as any}
+                    width={column.width}
                     allowsSorting={column.sortable}
                   >
-                    <div className="flex items-center gap-2">
-                      {column.name}
-                      {column.filterOptions && (
-                        <Dropdown>
-                          <DropdownTrigger>
-                            <Button 
-                              isIconOnly
-                              size="sm"
-                              variant="light"
-                              className="ml-2 -mr-2"
-                            >
-                              <FunnelIcon className="w-3.5 h-3.5" />
-                            </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu aria-label={`Filter ${column.name}`}>
-                            {column.filterOptions.map((option) => (
-                              <DropdownItem 
-                                key={option.key}
-                                className="capitalize"
-                              >
-                                {option.label}
-                              </DropdownItem>
-                            ))}
-                          </DropdownMenu>
-                        </Dropdown>
-                      )}
-                    </div>
+                    {column.name}
                   </TableColumn>
                 )}
               </TableHeader>

@@ -11,7 +11,6 @@ import {
   Chip,
 } from "@nextui-org/react";
 import { 
-  BuildingOfficeIcon,
   ArrowUpTrayIcon,
   ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";

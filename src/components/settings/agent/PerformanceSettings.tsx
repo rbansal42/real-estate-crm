@@ -2,11 +2,7 @@ import {
   Card,
   CardBody,
   Progress,
-  Chip,
 } from "@nextui-org/react";
-import { 
-  ChartBarIcon,
-} from "@heroicons/react/24/outline";
 import { useState } from "react";
 
 interface PerformanceMetrics {

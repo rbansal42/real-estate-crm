@@ -22,7 +22,6 @@ import { useState } from "react";
 
 export default function SecuritySettings() {
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-  const [sessionTimeout, setSessionTimeout] = useState(30);
 
   const devices = [
     { 

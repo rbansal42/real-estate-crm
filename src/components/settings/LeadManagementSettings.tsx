@@ -4,8 +4,6 @@ import {
   Card,
   CardBody,
   Switch,
-  Select,
-  SelectItem,
   Input,
   Button,
   Table,
@@ -18,16 +16,8 @@ import {
 import { 
   UserGroupIcon, 
   ArrowPathIcon,
-  ClockIcon,
 } from "@heroicons/react/24/outline";
 import { useState } from "react";
-
-const leadSources = [
-  { value: 'website', label: 'Website' },
-  { value: 'mobile_app', label: 'Mobile App' },
-  { value: 'direct_call', label: 'Direct Call' },
-  { value: 'partner_referral', label: 'Partner Referral' },
-];
 
 export default function LeadManagementSettings() {
   const [autoAssign, setAutoAssign] = useState(true);
