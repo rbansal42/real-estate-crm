@@ -26,7 +26,6 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Textarea,
   Divider,
 } from '@nextui-org/react';
 import {
