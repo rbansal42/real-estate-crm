@@ -21,6 +21,13 @@ import {
   DropdownItem,
   Selection,
   SortDescriptor,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Textarea,
+  Divider,
 } from '@nextui-org/react';
 import {
   PlusIcon,
@@ -62,6 +69,24 @@ export default function LeadsPage() {
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "lead",
     direction: "ascending",
+  });
+  const [isNewLeadModalOpen, setIsNewLeadModalOpen] = useState(false);
+  const [newLead, setNewLead] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    source: '',
+    budget: {
+      min: 0,
+      max: 0
+    },
+    requirements: {
+      propertyType: [] as string[],
+      location: [] as string[],
+      minBedrooms: undefined as number | undefined,
+      minBathrooms: undefined as number | undefined,
+      minArea: undefined as number | undefined
+    }
   });
 
   // Calculate lead statistics
@@ -366,6 +391,12 @@ export default function LeadsPage() {
     console.log('Rows per page changed:', value);
   };
 
+  const handleNewLeadSubmit = () => {
+    // TODO: Implement lead creation
+    console.log('New Lead:', newLead);
+    setIsNewLeadModalOpen(false);
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6 p-6">
@@ -404,6 +435,7 @@ export default function LeadsPage() {
             <Button 
               color="primary"
               startContent={<PlusIcon className="w-4 h-4" />}
+              onClick={() => setIsNewLeadModalOpen(true)}
             >
               New Lead
             </Button>
@@ -551,6 +583,188 @@ export default function LeadsPage() {
             </Table>
           </CardBody>
         </Card>
+
+        {/* New Lead Modal */}
+        <Modal 
+          isOpen={isNewLeadModalOpen} 
+          onClose={() => setIsNewLeadModalOpen(false)}
+          size="3xl"
+        >
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalHeader className="flex flex-col gap-1">
+                  Add New Lead
+                </ModalHeader>
+                <ModalBody>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Input
+                      label="Name"
+                      placeholder="Enter lead name"
+                      value={newLead.name}
+                      onChange={(e) => setNewLead(prev => ({ ...prev, name: e.target.value }))}
+                    />
+                    <Input
+                      type="email"
+                      label="Email"
+                      placeholder="Enter email address"
+                      value={newLead.email}
+                      onChange={(e) => setNewLead(prev => ({ ...prev, email: e.target.value }))}
+                    />
+                    <Input
+                      type="tel"
+                      label="Phone"
+                      placeholder="Enter phone number"
+                      value={newLead.phone}
+                      onChange={(e) => setNewLead(prev => ({ ...prev, phone: e.target.value }))}
+                    />
+                    <Select
+                      label="Source"
+                      placeholder="Select lead source"
+                      value={newLead.source}
+                      onChange={(e) => setNewLead(prev => ({ ...prev, source: e.target.value }))}
+                    >
+                      <SelectItem key="website" value="website">Website</SelectItem>
+                      <SelectItem key="mobile_app" value="mobile_app">Mobile App</SelectItem>
+                      <SelectItem key="direct_call" value="direct_call">Direct Call</SelectItem>
+                      <SelectItem key="partner_referral" value="partner_referral">Partner Referral</SelectItem>
+                      <SelectItem key="other" value="other">Other</SelectItem>
+                    </Select>
+                  </div>
+
+                  <Divider className="my-4" />
+                  
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Budget Range</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Input
+                        type="number"
+                        label="Minimum Budget"
+                        placeholder="Enter minimum budget"
+                        value={newLead.budget.min.toString()}
+                        onChange={(e) => setNewLead(prev => ({ 
+                          ...prev, 
+                          budget: { ...prev.budget, min: parseInt(e.target.value) || 0 }
+                        }))}
+                        startContent={
+                          <div className="pointer-events-none flex items-center">
+                            <span className="text-default-400 text-small">₹</span>
+                          </div>
+                        }
+                      />
+                      <Input
+                        type="number"
+                        label="Maximum Budget"
+                        placeholder="Enter maximum budget"
+                        value={newLead.budget.max.toString()}
+                        onChange={(e) => setNewLead(prev => ({ 
+                          ...prev, 
+                          budget: { ...prev.budget, max: parseInt(e.target.value) || 0 }
+                        }))}
+                        startContent={
+                          <div className="pointer-events-none flex items-center">
+                            <span className="text-default-400 text-small">₹</span>
+                          </div>
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Requirements</h3>
+                    <Select
+                      label="Property Types"
+                      placeholder="Select property types"
+                      selectionMode="multiple"
+                      value={newLead.requirements.propertyType}
+                      onChange={(e) => setNewLead(prev => ({ 
+                        ...prev, 
+                        requirements: { 
+                          ...prev.requirements, 
+                          propertyType: Array.from(e.target.selectedOptions, option => option.value)
+                        }
+                      }))}
+                    >
+                      <SelectItem key="apartment" value="apartment">Apartment</SelectItem>
+                      <SelectItem key="house" value="house">House</SelectItem>
+                      <SelectItem key="villa" value="villa">Villa</SelectItem>
+                      <SelectItem key="commercial" value="commercial">Commercial</SelectItem>
+                    </Select>
+
+                    <Select
+                      label="Preferred Locations"
+                      placeholder="Select locations"
+                      selectionMode="multiple"
+                      value={newLead.requirements.location}
+                      onChange={(e) => setNewLead(prev => ({ 
+                        ...prev, 
+                        requirements: { 
+                          ...prev.requirements, 
+                          location: Array.from(e.target.selectedOptions, option => option.value)
+                        }
+                      }))}
+                    >
+                      <SelectItem key="andheri" value="Andheri">Andheri</SelectItem>
+                      <SelectItem key="bandra" value="Bandra">Bandra</SelectItem>
+                      <SelectItem key="powai" value="Powai">Powai</SelectItem>
+                      <SelectItem key="thane" value="Thane">Thane</SelectItem>
+                    </Select>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <Input
+                        type="number"
+                        label="Min. Bedrooms"
+                        placeholder="Enter minimum bedrooms"
+                        value={newLead.requirements.minBedrooms?.toString() || ''}
+                        onChange={(e) => setNewLead(prev => ({ 
+                          ...prev, 
+                          requirements: { 
+                            ...prev.requirements, 
+                            minBedrooms: parseInt(e.target.value) || undefined 
+                          }
+                        }))}
+                      />
+                      <Input
+                        type="number"
+                        label="Min. Bathrooms"
+                        placeholder="Enter minimum bathrooms"
+                        value={newLead.requirements.minBathrooms?.toString() || ''}
+                        onChange={(e) => setNewLead(prev => ({ 
+                          ...prev, 
+                          requirements: { 
+                            ...prev.requirements, 
+                            minBathrooms: parseInt(e.target.value) || undefined 
+                          }
+                        }))}
+                      />
+                      <Input
+                        type="number"
+                        label="Min. Area (sq ft)"
+                        placeholder="Enter minimum area"
+                        value={newLead.requirements.minArea?.toString() || ''}
+                        onChange={(e) => setNewLead(prev => ({ 
+                          ...prev, 
+                          requirements: { 
+                            ...prev.requirements, 
+                            minArea: parseInt(e.target.value) || undefined 
+                          }
+                        }))}
+                      />
+                    </div>
+                  </div>
+                </ModalBody>
+                <ModalFooter>
+                  <Button variant="flat" onPress={onClose}>
+                    Cancel
+                  </Button>
+                  <Button color="primary" onPress={handleNewLeadSubmit}>
+                    Add Lead
+                  </Button>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
       </div>
     </DashboardLayout>
   );
