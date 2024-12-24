@@ -18,4 +18,11 @@ export interface QueryConfig {
   limit?: number;
   sort?: string;
   order?: 'asc' | 'desc';
+}
+
+export interface UserSettingsInput {
+  name: string;
+  email: string;
+  phone: string;
+  designation: string;
 } 

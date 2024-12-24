@@ -1,11 +1,28 @@
-import { Navbar, NavbarBrand, NavbarContent, Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
+"use client";
+
+import {
+  Navbar,
+  NavbarContent,
+  NavbarItem,
+  Button,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Avatar,
+} from "@nextui-org/react";
+import { 
+  UserCircleIcon, 
+  Cog6ToothIcon,
+  ArrowRightOnRectangleIcon 
+} from "@heroicons/react/24/outline";
+import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { ROUTES } from "@/constants/app.constants";
-import { useRouter } from "next/navigation";
 
 export default function Header() {
-  const { user, logout } = useAuthStore();
   const router = useRouter();
+  const { user, logout } = useAuthStore();
 
   const handleLogout = () => {
     logout();
@@ -13,33 +30,56 @@ export default function Header() {
   };
 
   return (
-    <Navbar className="border-b border-divider bg-background">
-      <NavbarBrand>
-        <p className="font-bold text-inherit">PropDekho CRM</p>
-      </NavbarBrand>
-
+    <Navbar
+      className="bg-background/70 backdrop-blur-md"
+      classNames={{
+        wrapper: "px-4",
+      }}
+    >
       <NavbarContent justify="end">
-        <Dropdown placement="bottom-end">
-          <DropdownTrigger>
-            <Avatar
-              isBordered
-              color="secondary"
-              as="button"
-              className="transition-transform"
-              src={`https://ui-avatars.com/api/?name=${user?.name}&background=8b5cf6&color=fff`}
-            />
-          </DropdownTrigger>
-          <DropdownMenu aria-label="Profile Actions" variant="flat">
-            <DropdownItem key="profile" className="h-14 gap-2">
-              <p className="font-semibold">Signed in as</p>
-              <p className="font-semibold">{user?.email}</p>
-            </DropdownItem>
-            <DropdownItem key="settings">Settings</DropdownItem>
-            <DropdownItem key="logout" color="danger" onClick={handleLogout}>
-              Log Out
-            </DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
+        <NavbarItem>
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <Button
+                variant="light"
+                isIconOnly
+                className="rounded-full"
+              >
+                <Avatar
+                  icon={<UserCircleIcon className="w-6 h-6" />}
+                  classNames={{
+                    base: "bg-primary/20",
+                    icon: "text-primary",
+                  }}
+                />
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Profile actions">
+              <DropdownItem
+                key="profile"
+                startContent={<UserCircleIcon className="w-5 h-5" />}
+              >
+                {user?.email}
+              </DropdownItem>
+              <DropdownItem
+                key="settings"
+                startContent={<Cog6ToothIcon className="w-5 h-5" />}
+                onPress={() => router.push(ROUTES.SETTINGS)}
+              >
+                Settings
+              </DropdownItem>
+              <DropdownItem
+                key="logout"
+                className="text-danger"
+                color="danger"
+                startContent={<ArrowRightOnRectangleIcon className="w-5 h-5" />}
+                onPress={handleLogout}
+              >
+                Log Out
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        </NavbarItem>
       </NavbarContent>
     </Navbar>
   );
