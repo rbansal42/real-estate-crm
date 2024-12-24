@@ -55,7 +55,7 @@ export default function TeamSettings() {
     },
   ]);
 
-  const statusColorMap = {
+  const statusColorMap: Record<string, "success" | "danger" | "warning"> = {
     active: "success",
     inactive: "danger",
     pending: "warning",
@@ -107,14 +107,16 @@ export default function TeamSettings() {
               </DropdownTrigger>
               <DropdownMenu>
                 <DropdownItem
+                  key="edit"
                   startContent={<PencilIcon className="w-4 h-4" />}
                 >
                   Edit
                 </DropdownItem>
                 <DropdownItem
+                  key="delete"
+                  startContent={<TrashIcon className="w-4 h-4" />}
                   className="text-danger"
                   color="danger"
-                  startContent={<TrashIcon className="w-4 h-4" />}
                 >
                   Delete
                 </DropdownItem>

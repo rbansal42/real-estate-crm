@@ -1,11 +1,17 @@
 "use client";
 
-import { Card, CardBody, Input, Button, Avatar } from "@nextui-org/react";
+import {
+  Input,
+  Button,
+  Avatar,
+} from "@nextui-org/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { companySettingsSchema } from "@/schemas/settings.schema";
-import type { CompanySettingsInput } from "@/types";
+import type { z } from "zod";
 import { BuildingOfficeIcon } from "@heroicons/react/24/outline";
+
+type CompanySettingsInput = z.infer<typeof companySettingsSchema>;
 
 export default function CompanySettings() {
   const { register, handleSubmit, formState: { errors } } = useForm<CompanySettingsInput>({

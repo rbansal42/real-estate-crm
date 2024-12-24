@@ -1,11 +1,17 @@
 "use client";
 
-import { Card, CardBody, Input, Button, Avatar } from "@nextui-org/react";
+import {
+  Input,
+  Button,
+  Avatar,
+} from "@nextui-org/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { userSettingsSchema } from "@/schemas/settings.schema";
-import type { UserSettingsInput } from "@/types";
+import type { z } from "zod";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
+
+type UserSettingsInput = z.infer<typeof userSettingsSchema>;
 
 export default function UserSettings() {
   const { register, handleSubmit, formState: { errors } } = useForm<UserSettingsInput>({

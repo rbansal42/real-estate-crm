@@ -10,6 +10,7 @@ import {
   Popover,
   PopoverTrigger,
   PopoverContent,
+  Selection
 } from "@nextui-org/react";
 import { FunnelIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
@@ -30,20 +31,21 @@ const amenities = [
 export default function PropertyFilters() {
   const [filters, setFilters] = useState({
     search: '',
-    type: new Set([]),
+    type: new Set([]) as Selection,
     priceRange: [0, 10000000],
-    amenities: new Set([]),
+    amenities: new Set([]) as Selection,
     bedrooms: '',
     location: '',
-    status: new Set([]),
+    status: new Set([]) as Selection,
   });
 
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
 
-  type FilterValue = string | Set<string> | number[] | string[];
+  type FilterValue = string | Selection | number | number[] | string[];
 
   const handleFilterChange = (key: string, value: FilterValue) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    const finalValue = value instanceof Set ? value : value;
+    setFilters(prev => ({ ...prev, [key]: finalValue }));
     if (!activeFilters.includes(key)) {
       setActiveFilters(prev => [...prev, key]);
     }
@@ -52,7 +54,7 @@ export default function PropertyFilters() {
   const removeFilter = (key: string) => {
     setFilters(prev => ({ 
       ...prev, 
-      [key]: key === 'priceRange' ? [0, 10000000] : new Set([])
+      [key]: key === 'priceRange' ? [0, 10000000] : new Set([]) as Selection
     }));
     setActiveFilters(prev => prev.filter(f => f !== key));
   };
@@ -155,12 +157,12 @@ export default function PropertyFilters() {
             onClick={() => {
               setFilters({
                 search: '',
-                type: new Set([]),
+                type: new Set([]) as Selection,
                 priceRange: [0, 10000000],
-                amenities: new Set([]),
+                amenities: new Set([]) as Selection,
                 bedrooms: '',
                 location: '',
-                status: new Set([]),
+                status: new Set([]) as Selection,
               });
               setActiveFilters([]);
             }}

@@ -7,12 +7,11 @@ import {
   TableColumn,
   TableRow,
   TableCell,
+  User,
   Chip,
   Button,
-  User,
 } from "@nextui-org/react";
 import { 
-  UserGroupIcon,
   CalendarIcon,
   ChatBubbleLeftIcon,
 } from "@heroicons/react/24/outline";
@@ -50,7 +49,7 @@ export default function LeadManagementSettings() {
     },
   ]);
 
-  const statusColorMap = {
+  const statusColorMap: Record<string, "success" | "warning" | "danger"> = {
     "Meeting Scheduled": "success",
     "Follow Up": "warning",
     "Not Interested": "danger",
