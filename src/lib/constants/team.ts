@@ -6,7 +6,7 @@ export const USER_ROLES = {
   },
   manager: {
     label: 'Manager',
-    color: 'bg-purple-500',
+    color: 'bg-indigo-500',
     permissions: ['manage_team', 'manage_leads', 'view_reports']
   },
   agent: {
