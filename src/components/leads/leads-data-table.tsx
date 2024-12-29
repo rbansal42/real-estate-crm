@@ -56,8 +56,6 @@ export function LeadsDataTable({ data }: LeadsDataTableProps) {
   const [leadToDelete, setLeadToDelete] = useState<string | null>(null)
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
 
-  const { data: leads, isLoading } = useLeadsData()
-
   const columns: ColumnDef<Lead>[] = [
     {
       id: "select",
@@ -164,7 +162,7 @@ export function LeadsDataTable({ data }: LeadsDataTableProps) {
   ]
 
   const table = useReactTable({
-    data: leads || [],
+    data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

@@ -139,33 +139,11 @@ export function useLeadsData() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch leads data from API
-        const response = await fetch('/api/leads')
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        const leads = await response.json()
-        
-        // Fetch additional details for each lead in parallel
-        const leadsWithDetails = await Promise.all(
-          leads.map(async (lead: Lead) => {
-            const [requirements, interactions, agent] = await Promise.all([
-              fetch(`/api/leads/${lead.id}/requirements`).then(res => res.json()),
-              fetch(`/api/leads/${lead.id}/interactions`).then(res => res.json()),
-              fetch(`/api/leads/${lead.id}/agent`).then(res => res.json())
-            ])
-
-            return {
-              ...lead,
-              requirements,
-              interactions,
-              agent
-            }
-          })
-        )
-
-        setData(leadsWithDetails)
-        logger.info('Leads data fetched successfully', { count: leadsWithDetails.length })
+        // TODO: Replace with actual API call when ready
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        setData(dummyLeads)
+        logger.info('Leads data fetched successfully', { count: dummyLeads.length })
       } catch (error: unknown) {
         const err = error instanceof Error ? error : new Error('Unknown error occurred')
         setError(err)
