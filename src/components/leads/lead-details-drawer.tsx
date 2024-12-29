@@ -26,16 +26,41 @@ export function LeadDetailsDrawer({ lead, open, onOpenChange }: LeadDetailsDrawe
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (open) {
-      // Simulate loading time
-      const timer = setTimeout(() => {
-        setIsLoading(false)
-      }, 1000)
-      return () => clearTimeout(timer)
+    if (open && lead) {
+      setIsLoading(true)
+      
+      const loadLeadDetails = async () => {
+        try {
+          // Fetch lead details including:
+          // - Full requirements
+          // - Complete interaction history
+          // - Agent details
+          // - Schedule history
+          const [requirements, interactions, agentDetails, schedules] = await Promise.all([
+            fetch(`/api/leads/${lead.id}/requirements`).then(res => res.json()),
+            fetch(`/api/leads/${lead.id}/interactions`).then(res => res.json()),
+            fetch(`/api/leads/${lead.id}/agent`).then(res => res.json()),
+            fetch(`/api/leads/${lead.id}/schedules`).then(res => res.json())
+          ])
+
+          // Update lead data with fetched details
+          lead.requirements = requirements
+          lead.interactions = interactions
+          lead.agent = agentDetails
+          lead.schedules = schedules
+
+          setIsLoading(false)
+        } catch (error: unknown) {
+          logger.error("Error loading lead details:", { error })
+          setIsLoading(false)
+        }
+      }
+      
+      loadLeadDetails()
     } else {
       setIsLoading(true)
     }
-  }, [open])
+  }, [open, lead])
 
   if (!lead) return null
 

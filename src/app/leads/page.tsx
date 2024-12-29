@@ -16,7 +16,7 @@ export default function LeadsPage() {
         <h2 className="text-3xl font-bold tracking-tight">Leads Management</h2>
       </div>
       <div className="space-y-4">
-        {isLoading ? <LeadsTableSkeleton /> : <LeadsDataTable />}
+        {isLoading ? <LeadsTableSkeleton /> : <LeadsDataTable data={leads} />}
       </div>
     </div>
   )

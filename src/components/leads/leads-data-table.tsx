@@ -43,7 +43,11 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { LucideIcon } from 'lucide-react'
 import { Lead } from "@/hooks/use-leads-data"
 
-export function LeadsDataTable() {
+interface LeadsDataTableProps {
+  data: Lead[]
+}
+
+export function LeadsDataTable({ data }: LeadsDataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -195,17 +199,6 @@ export function LeadsDataTable() {
     }
     setDeleteDialogOpen(false)
     setLeadToDelete(null)
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <div className="flex flex-col items-center gap-2">
-          <LoadingSpinner className="h-8 w-8" />
-          <p className="text-sm text-muted-foreground">Loading leads...</p>
-        </div>
-      </div>
-    )
   }
 
   return (

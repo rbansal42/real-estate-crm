@@ -33,6 +33,13 @@ export interface Lead {
     role: string
     avatar?: string
   }
+  schedules: Array<{
+    id: string
+    date: string
+    time: string
+    type: string
+    notes: string
+  }>
 }
 
 // Temporary dummy data
@@ -79,8 +86,9 @@ const dummyLeads: Lead[] = [
     agent: {
       name: "Sarah Smith",
       role: "Senior Sales Agent",
-      avatar: null
-    }
+      avatar: undefined
+    },
+    schedules: []
   },
   {
     id: "2",
@@ -117,8 +125,9 @@ const dummyLeads: Lead[] = [
     agent: {
       name: "Mike Johnson",
       role: "Commercial Property Specialist",
-      avatar: null
-    }
+      avatar: undefined
+    },
+    schedules: []
   }
 ]
 
@@ -130,13 +139,37 @@ export function useLeadsData() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        setData(dummyLeads)
-        logger.info('Leads data fetched successfully')
-      } catch (err) {
-        setError(err as Error)
-        logger.error('Error fetching leads data:', err)
+        // Fetch leads data from API
+        const response = await fetch('/api/leads')
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        const leads = await response.json()
+        
+        // Fetch additional details for each lead in parallel
+        const leadsWithDetails = await Promise.all(
+          leads.map(async (lead: Lead) => {
+            const [requirements, interactions, agent] = await Promise.all([
+              fetch(`/api/leads/${lead.id}/requirements`).then(res => res.json()),
+              fetch(`/api/leads/${lead.id}/interactions`).then(res => res.json()),
+              fetch(`/api/leads/${lead.id}/agent`).then(res => res.json())
+            ])
+
+            return {
+              ...lead,
+              requirements,
+              interactions,
+              agent
+            }
+          })
+        )
+
+        setData(leadsWithDetails)
+        logger.info('Leads data fetched successfully', { count: leadsWithDetails.length })
+      } catch (error: unknown) {
+        const err = error instanceof Error ? error : new Error('Unknown error occurred')
+        setError(err)
+        logger.error('Error fetching leads data:', { error })
       } finally {
         setIsLoading(false)
       }
