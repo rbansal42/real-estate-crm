@@ -141,7 +141,6 @@ export function useLeadsData() {
       try {
         // TODO: Replace with actual API call when ready
         // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000))
         setData(dummyLeads)
         logger.info('Leads data fetched successfully', { count: dummyLeads.length })
       } catch (error: unknown) {
