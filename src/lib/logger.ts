@@ -1,27 +1,36 @@
-type LogLevel = 'info' | 'warn' | 'error'
+type LogLevel = 'info' | 'warn' | 'error' | 'debug'
+
+interface LogMessage {
+  level: LogLevel
+  message: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data?: Record<string, any>
+  timestamp: string
+}
 
 class Logger {
-  private isDevelopment = process.env.NODE_ENV === 'development'
-
-  private log(level: LogLevel, message: string, ...args: any[]) {
-    if (!this.isDevelopment) return
-
-    const timestamp = new Date().toISOString()
-    const prefix = `[${timestamp}] [${level.toUpperCase()}]`
-
-    console[level](`${prefix} ${message}`, ...args)
+  private formatMessage(level: LogLevel, message: string, data?: Record<string, unknown>): LogMessage {
+    return {
+      level,
+      message,
+      data,
+      timestamp: new Date().toISOString()
+    }
   }
 
-  info(message: string, ...args: any[]) {
-    this.log('info', message, ...args)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  info(message: string, data?: Record<string, any>): void {
+    console.log(this.formatMessage('info', message, data))
   }
 
-  warn(message: string, ...args: any[]) {
-    this.log('warn', message, ...args)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  warn(message: string, data?: Record<string, any>): void {
+    console.warn(this.formatMessage('warn', message, data))
   }
 
-  error(message: string, ...args: any[]) {
-    this.log('error', message, ...args)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  error(message: string, data?: Record<string, any>): void {
+    console.error(this.formatMessage('error', message, data))
   }
 }
 

@@ -8,8 +8,6 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Badge } from "@/components/ui/badge"
-import { USER_ROLES, DEPARTMENTS } from "@/lib/constants/team"
 import { Search, SlidersHorizontal, X } from "lucide-react"
 import { Table } from "@tanstack/react-table"
 import { TeamMember } from "@/lib/types/team"

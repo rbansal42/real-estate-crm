@@ -1,7 +1,6 @@
 "use client"
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
 import { TeamMember } from "@/lib/types/team"
 import { USER_ROLES, DEPARTMENTS } from "@/lib/constants/team"
 import { Badge } from "@/components/ui/badge"
@@ -9,15 +8,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { 
-  User, 
   Mail, 
   Phone, 
-  Calendar, 
-  Building2, 
-  Shield,
-  MapPin,
-  Phone as PhoneIcon,
-  TrendingUp,
+  Calendar,
   Users
 } from "lucide-react"
 import { format } from "date-fns"

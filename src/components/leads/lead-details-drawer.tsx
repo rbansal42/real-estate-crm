@@ -10,7 +10,8 @@ import { logger } from "@/lib/logger"
 import { LeadScheduleDialog } from "@/components/leads/lead-schedule-dialog"
 import { LeadStatusDialog } from "@/components/leads/lead-status-dialog"
 import { useState } from "react"
-import { Lead, Interaction, Requirement } from "@/hooks/use-leads-data"
+import { Lead } from "@/hooks/use-leads-data"
+import Image from "next/image"
 
 interface LeadDetailsDrawerProps {
   lead: Lead | null
@@ -127,10 +128,12 @@ export function LeadDetailsDrawer({ lead, open, onOpenChange }: LeadDetailsDrawe
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full bg-secondary/10 flex items-center justify-center">
                   {lead.agent.avatar ? (
-                    <img 
+                    <Image 
                       src={lead.agent.avatar} 
                       alt={lead.agent.name}
-                      className="h-10 w-10 rounded-full object-cover"
+                      width={40}
+                      height={40}
+                      className="rounded-full object-cover"
                     />
                   ) : (
                     <User className="h-6 w-6" />

@@ -31,8 +31,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { 
   MoreHorizontal, 
-  Pencil, 
-  Trash2, 
   Key, 
   UserCog,
   UserX,
@@ -180,6 +178,11 @@ export function TeamDataTable() {
       columnVisibility,
     },
   })
+
+  const handleRowAction = (action: string, member: TeamMember) => {
+    logger.info(`Team member action: ${action}`, { memberId: member.id })
+    // Implementation
+  }
 
   if (isLoading) {
     return <div>Loading...</div>

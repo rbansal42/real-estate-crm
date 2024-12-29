@@ -22,6 +22,10 @@ export default function TeamPage() {
   
   logger.info("Rendering team page")
 
+  if (isLoading) {
+    return <div className="flex-1 p-8">Loading...</div>
+  }
+
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between">

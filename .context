@@ -21,6 +21,7 @@
 - Use Next.js Image component for all images.
 - Use constants/dummyData/* for dummy data.
 - Always use logging to keep track of all events and actions. This will help in debugging and tracking. it will be removed in production.
+- Use version control system to manage code.
 
 # Guidelines for response
 - Go through the context and guidelines before responding

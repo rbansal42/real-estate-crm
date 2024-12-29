@@ -1,13 +1,14 @@
 "use client"
 
-import { Cross2Icon } from "@radix-ui/react-icons"
-import { Table } from "@tanstack/react-table"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { DataTableViewOptions } from "@/components/ui/data-table-view-options"
-import { DataTableFacetedFilter } from "@/components/ui/data-table-faceted-filter"
-import { Plus, Upload } from "lucide-react"
-import { logger } from "@/lib/logger"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Search, SlidersHorizontal, X } from "lucide-react"
 
 interface LeadsTableToolbarProps<TData> {
   table: Table<TData>

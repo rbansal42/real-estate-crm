@@ -40,17 +40,8 @@ import { LEAD_STATUS_CONFIG, LeadStatus } from "@/lib/constants"
 import * as Icons from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
-
-interface Lead {
-  id: string
-  name: string
-  email: string
-  phone: string
-  source: string
-  status: string
-  assignedTo: string
-  createdAt: string
-}
+import { LucideIcon } from 'lucide-react'
+import { Lead } from "@/hooks/use-leads-data"
 
 export function LeadsDataTable() {
   const [sorting, setSorting] = useState<SortingState>([])
@@ -115,12 +106,12 @@ export function LeadsDataTable() {
       cell: ({ row }) => {
         const status = row.getValue("status") as LeadStatus
         const config = LEAD_STATUS_CONFIG[status]
-        const Icon = Icons[config.icon as keyof typeof Icons]
+        const IconComponent = Icons[config.icon as keyof typeof Icons] as LucideIcon
         
         return (
           <div className="flex items-center gap-2">
             <Badge className={`${config.color} ${config.textColor} flex items-center gap-1`}>
-              <Icon className="h-3 w-3" />
+              <IconComponent className="h-3 w-3" />
               {status}
             </Badge>
           </div>
@@ -243,11 +234,9 @@ export function LeadsDataTable() {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="hover:bg-muted/50 transition-colors cursor-pointer"
-                  onClick={() => setSelectedLead(row.original)}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell className="py-3">
+                    <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -262,7 +251,7 @@ export function LeadsDataTable() {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  No leads found.
                 </TableCell>
               </TableRow>
             )}
