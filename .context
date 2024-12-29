@@ -1,0 +1,65 @@
+# Project
+- This is a Real Estate CRM.
+- It will be used to manage leads, teams, and properties.
+- It has an import feature to import leads from CSV from various sources like MagicBricks, 99acres, etc.
+- It has a lead management feature to manage leads.
+- It has a team management feature to manage teams.
+- It has a property management feature to manage properties.
+
+# Design System
+- Use Lucide Icons for all icons
+- Use hsl values for all colors
+- There will be a light and dark theme.
+- Use indigo-500 as primary color
+- Use blue-500 as secondary color
+- Use shadcn/ui for all components
+
+# Guidelines
+- Use onPress instead of onClick for all components. onClick is deprecated.
+- Use App Router
+- Use Next.js Link component for all internal links.
+- Use Next.js Image component for all images.
+- Use constants/dummyData/* for dummy data.
+- Always use logging to keep track of all events and actions. This will help in debugging and tracking. it will be removed in production.
+
+# Guidelines for response
+- Go through the context and guidelines before responding
+- If you are not sure about context, guidelines, project, or something, ask the user for clarification
+- Always build 1 feature at a time, and buil it complete. Resolve all dependencies
+
+# Version Control System
+- Use Git to manage code
+- Use GitHub to host code
+- Use atomic commits
+- Use feature branches
+
+- There should be a consistent color palette
+- There should be a consistent typography
+  - Use Work Sans as the font family (https://fonts.google.com/specimen/Work+Sans)
+- There should be a consistent layout
+- Elements should be responsive and consistent. Should be mobile friendly.
+
+## UX
+- Destructive actions should have a confirmation dialog
+- Tables
+  - Table should have a pagination component with options to change the number of rows per page and to jump to a specific page
+  - Table should have a search input
+  - Table should have a filter component
+  - Table should have a sort component
+  - Table should have a column header component
+  - Table should have a column data component
+  - Table should have a row component
+  - Table should have a cell component
+  - Table should have a column for action buttons on the rightmost side of the rows
+  - Table should have a checkbox for each row
+  - Table should allow bulk actions
+
+# Code Generation
+- Page dependencies should be organized in separate directories and imported as needed:
+  - Components → /components
+  - Hooks → /hooks
+  - Contexts → /contexts
+  - Utilities → /utils
+  - Services → /services (including API calls and external data handling)
+Create these dependencies if they don't exist in their respective directories.
+- Verify that the package.json should have all the dependencies and dev dependencies before importing them anywhere.
