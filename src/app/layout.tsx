@@ -1,45 +1,35 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { Header } from "@/components/layout/header";
-import { Sidebar } from "@/components/layout/sidebar";
-import { logger } from "@/lib/logger";
-import { ThemeProvider } from "@/components/theme-provider";
+import type { Metadata } from "next"
+import { Work_Sans } from "next/font/google"
+import "./globals.css"
+import { ThemeProvider } from "@/components/providers/theme-provider"
+import { QueryProvider } from "@/components/providers/query-provider"
+import { Toaster } from "@/components/ui/toaster"
+import ClientLayout from "./layout.client"
 
-const inter = Inter({ subsets: ["latin"] });
+const workSans = Work_Sans({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Real Estate CRM",
-  description: "Manage your real estate leads, teams, and properties",
-};
+  title: "PropDekho CRM",
+  description: "Real Estate CRM for managing leads, teams, and properties",
+}
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  logger.info("Rendering root layout")
-
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <div className="flex h-screen">
-            <Sidebar />
-            <div className="flex-1 flex flex-col">
-              <Header />
-              <main className="flex-1 overflow-y-auto">
-                {children}
-              </main>
-            </div>
-          </div>
+      <body className={workSans.className}>
+        <ThemeProvider>
+          <QueryProvider>
+            <ClientLayout>
+              {children}
+            </ClientLayout>
+            <Toaster />
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>
-  );
+  )
 }
