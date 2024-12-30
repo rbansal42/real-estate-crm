@@ -1,159 +1,93 @@
-import { useState, useEffect } from 'react'
-import { logger } from '@/lib/logger'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Lead } from '@/lib/types/lead';
+import { dummyLeads } from '@/constants/dummy-data/leads';
+import { logger } from '@/lib/logger';
 
-export interface Requirement {
-  type: string
-  budget: string
-  location: string
-  propertyType: string
-  bedrooms: number
-}
+// In a real app, these would be API calls
+const fetchLeads = async (): Promise<Lead[]> => {
+  logger.info('Fetching leads');
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return dummyLeads;
+};
 
-export interface Interaction {
-  id: string
-  type: 'Call' | 'Email' | 'Meeting' | 'WhatsApp'
-  notes: string
-  date: string
-  agent: string
-}
+const addLead = async (lead: Omit<Lead, 'id' | 'createdAt' | 'updatedAt'>): Promise<Lead> => {
+  logger.info('Adding lead', { lead });
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  const newLead: Lead = {
+    ...lead,
+    id: Math.random().toString(36).substr(2, 9),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  return newLead;
+};
 
-export interface Lead {
-  id: string
-  name: string
-  email: string
-  phone: string
-  source: string
-  status: string
-  assignedTo: string
-  createdAt: string
-  requirements: Requirement
-  interactions: Interaction[]
-  agent: {
-    name: string
-    role: string
-    avatar?: string
+const updateLead = async (lead: Partial<Lead> & { id: string }): Promise<Lead> => {
+  logger.info('Updating lead', { lead });
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  const existingLead = dummyLeads.find((l: Lead) => l.id === lead.id);
+  if (!existingLead) {
+    throw new Error('Lead not found');
   }
-  schedules: Array<{
-    id: string
-    date: string
-    time: string
-    type: string
-    notes: string
-  }>
-}
+  const updatedLead: Lead = {
+    ...existingLead,
+    ...lead,
+    updatedAt: new Date().toISOString(),
+  };
+  return updatedLead;
+};
 
-// Temporary dummy data
-const dummyLeads: Lead[] = [
-  {
-    id: "1",
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "+91 9876543210",
-    source: "MagicBricks",
-    status: "New",
-    assignedTo: "Sarah Smith",
-    createdAt: "2024-03-20",
-    requirements: {
-      type: "Residential",
-      budget: "₹50L - ₹75L",
-      location: "Whitefield, Bangalore",
-      propertyType: "2 BHK Apartment",
-      bedrooms: 2
-    },
-    interactions: [
-      {
-        id: "int1",
-        type: "Call",
-        notes: "Initial discussion about requirements. Looking for a 2BHK in Whitefield area.",
-        date: "2024-03-20 14:30",
-        agent: "Sarah Smith"
-      },
-      {
-        id: "int2",
-        type: "Email",
-        notes: "Sent property recommendations for 3 properties in Whitefield matching budget.",
-        date: "2024-03-21 11:15",
-        agent: "Sarah Smith"
-      },
-      {
-        id: "int3",
-        type: "WhatsApp",
-        notes: "Shared virtual tour links of the properties.",
-        date: "2024-03-21 15:45",
-        agent: "Sarah Smith"
-      }
-    ],
-    agent: {
-      name: "Sarah Smith",
-      role: "Senior Sales Agent",
-      avatar: undefined
-    },
-    schedules: []
-  },
-  {
-    id: "2",
-    name: "Priya Sharma",
-    email: "priya.sharma@gmail.com",
-    phone: "+91 9876543211",
-    source: "99acres",
-    status: "Qualified",
-    assignedTo: "Mike Johnson",
-    createdAt: "2024-03-19",
-    requirements: {
-      type: "Commercial",
-      budget: "₹2Cr - ₹3Cr",
-      location: "Indiranagar, Bangalore",
-      propertyType: "Office Space",
-      bedrooms: 0
-    },
-    interactions: [
-      {
-        id: "int4",
-        type: "Meeting",
-        notes: "Site visit to commercial property in Indiranagar. Client liked the location.",
-        date: "2024-03-19 10:00",
-        agent: "Mike Johnson"
-      },
-      {
-        id: "int5",
-        type: "Call",
-        notes: "Discussion about lease terms and pricing negotiation.",
-        date: "2024-03-20 16:30",
-        agent: "Mike Johnson"
-      }
-    ],
-    agent: {
-      name: "Mike Johnson",
-      role: "Commercial Property Specialist",
-      avatar: undefined
-    },
-    schedules: []
-  }
-]
+const deleteLead = async (id: string): Promise<void> => {
+  logger.info('Deleting lead', { id });
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+};
 
 export function useLeadsData() {
-  const [data, setData] = useState<Lead[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // TODO: Replace with actual API call when ready
-        // Simulate API delay
-        setData(dummyLeads)
-        logger.info('Leads data fetched successfully', { count: dummyLeads.length })
-      } catch (error: unknown) {
-        const err = error instanceof Error ? error : new Error('Unknown error occurred')
-        setError(err)
-        logger.error('Error fetching leads data:', { error })
-      } finally {
-        setIsLoading(false)
-      }
-    }
+  const { data: leads, isLoading, error } = useQuery({
+    queryKey: ['leads'],
+    queryFn: fetchLeads,
+  });
 
-    fetchData()
-  }, [])
+  const addLeadMutation = useMutation({
+    mutationFn: addLead,
+    onSuccess: (newLead) => {
+      queryClient.setQueryData(['leads'], (old: Lead[] = []) => [...old, newLead]);
+    },
+  });
 
-  return { data, isLoading, error }
+  const updateLeadMutation = useMutation({
+    mutationFn: updateLead,
+    onSuccess: (updatedLead) => {
+      queryClient.setQueryData(['leads'], (old: Lead[] = []) => 
+        old.map(lead => lead.id === updatedLead.id ? updatedLead : lead)
+      );
+    },
+  });
+
+  const deleteLeadMutation = useMutation({
+    mutationFn: deleteLead,
+    onSuccess: (_, id) => {
+      queryClient.setQueryData(['leads'], (old: Lead[] = []) => 
+        old.filter(lead => lead.id !== id)
+      );
+    },
+  });
+
+  return {
+    leads,
+    isLoading,
+    error,
+    addLead: addLeadMutation.mutate,
+    updateLead: updateLeadMutation.mutate,
+    deleteLead: deleteLeadMutation.mutate,
+    isAddingLead: addLeadMutation.isPending,
+    isUpdatingLead: updateLeadMutation.isPending,
+    isDeletingLead: deleteLeadMutation.isPending,
+  };
 } 
