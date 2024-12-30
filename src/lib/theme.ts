@@ -1,30 +1,51 @@
-export const theme = {
+export const themeConfig = {
   colors: {
-    primary: 'hsl(231, 48%, 48%)', // indigo-500
-    secondary: 'hsl(217, 91%, 60%)', // blue-500
-    background: 'hsl(0, 0%, 100%)',
-    foreground: 'hsl(224, 71%, 4%)',
-    muted: 'hsl(220, 14%, 96%)',
-    'muted-foreground': 'hsl(220, 9%, 46%)',
-    popover: 'hsl(0, 0%, 100%)',
-    'popover-foreground': 'hsl(224, 71%, 4%)',
-    card: 'hsl(0, 0%, 100%)',
-    'card-foreground': 'hsl(224, 71%, 4%)',
-    border: 'hsl(220, 13%, 91%)',
-    input: 'hsl(220, 13%, 91%)',
-    ring: 'hsl(231, 48%, 48%)',
+    primary: {
+      light: 'hsl(231, 48%, 48%)', // indigo-500 in light mode
+      dark: 'hsl(231, 48%, 56%)', // indigo-500 in dark mode
+    },
+    secondary: {
+      light: 'hsl(217, 91%, 60%)', // blue-500 in light mode
+      dark: 'hsl(217, 91%, 65%)', // blue-500 in dark mode
+    },
+    background: {
+      light: 'hsl(0, 0%, 100%)',
+      dark: 'hsl(224, 71%, 4%)',
+    },
+    foreground: {
+      light: 'hsl(222.2, 47.4%, 11.2%)',
+      dark: 'hsl(210, 40%, 98%)',
+    },
+    muted: {
+      light: 'hsl(210, 40%, 96.1%)',
+      dark: 'hsl(217.2, 32.6%, 17.5%)',
+    },
+    accent: {
+      light: 'hsl(210, 40%, 96.1%)',
+      dark: 'hsl(217.2, 32.6%, 17.5%)',
+    },
+    popover: {
+      light: 'hsl(0, 0%, 100%)',
+      dark: 'hsl(224, 71%, 4%)',
+    },
+    card: {
+      light: 'hsl(0, 0%, 100%)',
+      dark: 'hsl(224, 71%, 4%)',
+    },
+    border: {
+      light: 'hsl(214.3, 31.8%, 91.4%)',
+      dark: 'hsl(217.2, 32.6%, 17.5%)',
+    },
+    input: {
+      light: 'hsl(214.3, 31.8%, 91.4%)',
+      dark: 'hsl(217.2, 32.6%, 17.5%)',
+    },
+    ring: {
+      light: 'hsl(222.2, 47.4%, 11.2%)',
+      dark: 'hsl(212.7, 26.8%, 83.9%)',
+    },
   },
-  dark: {
-    background: 'hsl(224, 71%, 4%)',
-    foreground: 'hsl(213, 31%, 91%)',
-    muted: 'hsl(223, 47%, 11%)',
-    'muted-foreground': 'hsl(215.4, 16.3%, 56.9%)',
-    popover: 'hsl(224, 71%, 4%)',
-    'popover-foreground': 'hsl(215, 20.2%, 65.1%)',
-    card: 'hsl(224, 71%, 4%)',
-    'card-foreground': 'hsl(213, 31%, 91%)',
-    border: 'hsl(216, 34%, 17%)',
-    input: 'hsl(216, 34%, 17%)',
-    ring: 'hsl(231, 48%, 48%)',
-  }
-} 
+  fontFamily: {
+    sans: ['Work Sans', 'sans-serif'],
+  },
+} as const; 

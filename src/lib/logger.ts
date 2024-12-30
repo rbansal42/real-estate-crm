@@ -1,37 +1,47 @@
-type LogLevel = 'info' | 'warn' | 'error' | 'debug'
+type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
 interface LogMessage {
-  level: LogLevel
-  message: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data?: Record<string, any>
-  timestamp: string
+  level: LogLevel;
+  message: string;
+  data?: Record<string, unknown>;
+  timestamp: string;
 }
 
 class Logger {
+  private isDevelopment = process.env.NODE_ENV === 'development';
+
   private formatMessage(level: LogLevel, message: string, data?: Record<string, unknown>): LogMessage {
     return {
       level,
       message,
       data,
-      timestamp: new Date().toISOString()
-    }
+      timestamp: new Date().toISOString(),
+    };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  info(message: string, data?: Record<string, any>): void {
-    console.log(this.formatMessage('info', message, data))
+  info(message: string, data?: Record<string, unknown>): void {
+    if (!this.isDevelopment) return;
+    const formattedMessage = this.formatMessage('info', message, data);
+    console.log(`[INFO] ${formattedMessage.timestamp}:`, message, data || '');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  warn(message: string, data?: Record<string, any>): void {
-    console.warn(this.formatMessage('warn', message, data))
+  warn(message: string, data?: Record<string, unknown>): void {
+    if (!this.isDevelopment) return;
+    const formattedMessage = this.formatMessage('warn', message, data);
+    console.warn(`[WARN] ${formattedMessage.timestamp}:`, message, data || '');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  error(message: string, data?: Record<string, any>): void {
-    console.error(this.formatMessage('error', message, data))
+  error(message: string, data?: Record<string, unknown>): void {
+    if (!this.isDevelopment) return;
+    const formattedMessage = this.formatMessage('error', message, data);
+    console.error(`[ERROR] ${formattedMessage.timestamp}:`, message, data || '');
+  }
+
+  debug(message: string, data?: Record<string, unknown>): void {
+    if (!this.isDevelopment) return;
+    const formattedMessage = this.formatMessage('debug', message, data);
+    console.debug(`[DEBUG] ${formattedMessage.timestamp}:`, message, data || '');
   }
 }
 
-export const logger = new Logger() 
+export const logger = new Logger(); 
