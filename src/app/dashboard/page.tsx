@@ -2,8 +2,28 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Building2, UserPlus, TrendingUp } from 'lucide-react';
+import { TrendChart } from '@/components/dashboard/trend-chart';
+import { RecentActivity } from '@/components/dashboard/recent-activity';
+import { TeamPerformance } from '@/components/dashboard/team-performance';
+import { PropertyStatus } from '@/components/dashboard/property-status';
+import { useDashboardData } from '@/hooks/use-dashboard-data';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 export default function DashboardPage() {
+  const { data, isLoading } = useDashboardData();
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (!data) {
+    return null;
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -17,7 +37,7 @@ export default function DashboardPage() {
             <UserPlus className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">123</div>
+            <div className="text-2xl font-bold">{data.totalLeads}</div>
             <p className="text-xs text-muted-foreground">
               +20.1% from last month
             </p>
@@ -30,7 +50,7 @@ export default function DashboardPage() {
             <Building2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">45</div>
+            <div className="text-2xl font-bold">{data.activeProperties}</div>
             <p className="text-xs text-muted-foreground">
               +12 new this month
             </p>
@@ -43,7 +63,7 @@ export default function DashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
+            <div className="text-2xl font-bold">{data.teamMembers}</div>
             <p className="text-xs text-muted-foreground">
               2 pending invites
             </p>
@@ -56,13 +76,39 @@ export default function DashboardPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24%</div>
+            <div className="text-2xl font-bold">{data.conversionRate}%</div>
             <p className="text-xs text-muted-foreground">
               +2.3% from last month
             </p>
           </CardContent>
         </Card>
       </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <TrendChart
+          title="Lead Trends"
+          data={data.leadTrends}
+          dataKey="leads"
+        />
+        <TrendChart
+          title="Property Trends"
+          data={data.propertyTrends}
+          dataKey="properties"
+        />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <TeamPerformance
+          data={data.teamPerformance}
+          className="md:col-span-4"
+        />
+        <PropertyStatus
+          data={data.propertyStatus}
+          className="md:col-span-3"
+        />
+      </div>
+
+      <RecentActivity activities={data.recentActivity} />
     </div>
   );
 } 
