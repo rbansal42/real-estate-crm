@@ -1,0 +1,381 @@
+# Real Estate CRM Development Guidelines
+
+## Project Overview
+A comprehensive CRM system for real estate brokers focusing on lead management, team organization, and property listings with a modern, responsive interface.
+
+## Architecture
+
+### Core Structure
+```
+src/
+├── app/             # Next.js App Router pages
+├── components/      # Reusable UI components
+├── hooks/           # Custom React hooks
+├── contexts/        # React contexts
+├── services/        # API and external services
+├── lib/            # Utilities and helpers
+└── constants/      # Application constants
+    |-- dummy-data/ # Dummy data for testing
+```
+
+### Key Design Patterns
+1. **Component Architecture**
+   - Atomic design principles
+   - Feature-based organization
+   - Reference implementation: 
+   
+```50:181:src/components/leads/leads-data-table.tsx
+export function LeadsDataTable({ data }: LeadsDataTableProps) {
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [rowSelection, setRowSelection] = useState({})
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [leadToDelete, setLeadToDelete] = useState<string | null>(null)
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
+
+  const columns: ColumnDef<Lead>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected()}
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+          className="border-primary/20 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "name",
+      header: "Name",
+      cell: ({ row }) => (
+        <Button
+          variant="link"
+          className="p-0 h-auto font-normal text-primary hover:text-primary/90"
+          onClick={() => setSelectedLead(row.original)}
+        >
+          {row.getValue("name")}
+        </Button>
+      ),
+    },
+    {
+      accessorKey: "email",
+      header: "Email",
+    },
+    {
+      accessorKey: "phone",
+      header: "Phone",
+    },
+    {
+      accessorKey: "source",
+      header: "Source",
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.getValue("status") as LeadStatus
+        const config = LEAD_STATUS_CONFIG[status]
+        const IconComponent = Icons[config.icon as keyof typeof Icons] as LucideIcon
+        
+        return (
+          <div className="flex items-center gap-2">
+            <Badge className={`${config.color} ${config.textColor} flex items-center gap-1`}>
+              <IconComponent className="h-3 w-3" />
+              {status}
+            </Badge>
+          </div>
+        )
+      },
+    },
+    {
+      accessorKey: "assignedTo",
+      header: "Assigned To",
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Created At",
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        const lead = row.original
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-primary/5">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4 text-primary" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => handleEdit(lead.id)}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="text-red-600"
+                onClick={() => handleDeleteClick(lead.id)}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      },
+    },
+  ]
+
+  const table = useReactTable({
+    data,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+  })
+```
+
+
+2. **State Management**
+   - React Query for server state
+   - Context for global state
+   - Local state for UI components
+
+3. **Data Flow**
+   - Unidirectional data flow
+   - Props drilling prevention using contexts
+   - Example pattern:
+   
+```20:43:src/hooks/use-leads-data.ts
+export interface Lead {
+  id: string
+  name: string
+  email: string
+  phone: string
+  source: string
+  status: string
+  assignedTo: string
+  createdAt: string
+  requirements: Requirement
+  interactions: Interaction[]
+  agent: {
+    name: string
+    role: string
+    avatar?: string
+  }
+  schedules: Array<{
+    id: string
+    date: string
+    time: string
+    type: string
+    notes: string
+  }>
+}
+```
+
+
+## Design System
+
+### Visual Guidelines
+1. **Colors**
+   - Primary: indigo-500 (HSL)
+   - Secondary: blue-500 (HSL)
+   - Status colors defined in constants
+   - Dark/Light theme support
+
+2. **Typography**
+   - Font: Work Sans
+   - Consistent heading hierarchy
+   - Line heights and spacing scales
+
+3. **Components**
+   - shadcn/ui as base
+   - Lucide icons
+   - Custom components extend base design
+
+### UI Patterns
+1. **Tables**
+   - Reference implementation:
+   
+```13:45:src/components/leads/leads-table-skeleton.tsx
+export function LeadsTableSkeleton() {
+  return (
+    <div className="space-y-4">
+      {/* Toolbar Skeleton - Matches LeadsTableToolbar height */}
+      <div className="flex items-center justify-between h-10">
+        <div className="flex flex-1 items-center space-x-2">
+          <Skeleton className="h-9 w-[280px]" /> {/* Search input */}
+          <Skeleton className="h-9 w-[120px]" /> {/* Filter button */}
+        </div>
+        <div className="flex items-center space-x-2">
+          <Skeleton className="h-9 w-[120px]" /> {/* View columns */}
+          <Skeleton className="h-9 w-[120px]" /> {/* Reset filters */}
+        </div>
+      </div>
+
+      {/* Table Skeleton - Matches LeadsDataTable dimensions */}
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[40px]">
+                <Skeleton className="h-4 w-4" /> {/* Checkbox */}
+              </TableHead>
+              <TableHead className="w-[200px]"><Skeleton className="h-4 w-[120px]" /></TableHead>
+              <TableHead className="w-[250px]"><Skeleton className="h-4 w-[180px]" /></TableHead>
+              <TableHead className="w-[150px]"><Skeleton className="h-4 w-[100px]" /></TableHead>
+              <TableHead className="w-[120px]"><Skeleton className="h-4 w-[80px]" /></TableHead>
+              <TableHead className="w-[130px]"><Skeleton className="h-4 w-[100px]" /></TableHead>
+              <TableHead className="w-[180px]"><Skeleton className="h-4 w-[120px]" /></TableHead>
+              <TableHead className="w-[150px]"><Skeleton className="h-4 w-[120px]" /></TableHead>
+              <TableHead className="w-[50px]" /> {/* Actions column */}
+            </TableRow>
+          </TableHeader>
+```
+
+
+2. **Loading States**
+   - Skeleton loaders
+   - Progressive loading
+   - Optimistic updates
+
+3. **Forms**
+   - Validation patterns
+   - Error handling
+   - Accessibility compliance
+
+## Version Control Guidelines
+
+### Branch Strategy
+1. **Main Branches**
+   - `main`: Production code
+   - `develop`: Integration branch
+   - `staging`: Pre-production testing
+
+2. **Feature Branches**
+   - Format: `feature/[ticket-number]-brief-description`
+   - Example: `feature/CRM-123-lead-import`
+
+3. **Commit Standards**
+   - Atomic commits
+   - Format: `type(scope): description`
+   - Types: feat, fix, docs, style, refactor, test, chore
+
+### Code Review Process
+1. **Pre-Review Checklist**
+   - Lint checks pass
+   - Documentation updated
+   - No console logs (except logger)
+
+2. **Review Guidelines**
+   - Maximum 400 lines per review
+   - Required approvals: 2
+   - Address all comments before merge
+
+## Development Workflow
+
+### Feature Implementation
+1. **Planning**
+   - Component design
+   - Data structure definition
+   - API contract design
+
+2. **Implementation Order**
+   - Core functionality
+   - UI components
+   - Documentation
+
+3. **Quality Checks**
+   - TypeScript strict mode
+   - ESLint rules
+   - Accessibility testing
+   - Performance metrics
+
+### Code Organization
+1. **File Naming**
+   - Components: PascalCase
+   - Utilities: camelCase
+   - Constants: SCREAMING_SNAKE_CASE
+
+2. **Import Order**
+   - React/Next.js imports
+   - External libraries
+   - Internal components/utilities
+   - Types/interfaces
+   - Styles
+
+## Testing Strategy (To be ignored for now)
+
+### Unit Tests
+- Components
+- Hooks
+- Utilities
+- Coverage target: 80%
+
+### Integration Tests
+- Feature flows
+- API integration
+- State management
+
+### E2E Tests
+- Critical user paths
+- Cross-browser testing
+- Mobile responsiveness
+
+## Performance Guidelines
+
+### Optimization Techniques
+1. **Code Splitting**
+   - Route-based splitting
+   - Component lazy loading
+   - Dynamic imports
+
+2. **Asset Optimization**
+   - Image optimization
+   - Font loading strategy
+   - Bundle size monitoring
+
+3. **Caching Strategy**
+   - API response caching
+   - Static asset caching
+   - State persistence
+
+## Documentation Requirements
+
+### Code Documentation
+- JSDoc for public APIs
+- Component props documentation
+- Type definitions
+- Usage examples
+
+### Feature Documentation
+- User flows
+- Technical architecture
+- API endpoints
+- Configuration options
+
+This document should be used in conjunction with the `.cursorrules` file and existing implementation patterns in the codebase.
