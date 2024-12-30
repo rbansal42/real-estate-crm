@@ -15,7 +15,7 @@
 - Use shadcn/ui for all components
 
 # Guidelines
-- Use onPress instead of onClick for all components. onClick is deprecated.
+- Use onPress instead of onClick for all components except for shadcn/ui components.
 - Use App Router
 - Use Next.js Link component for all internal links.
 - Use Next.js Image component for all images.
@@ -34,6 +34,15 @@
 - Use atomic commits
 - Use feature branches
 
+# Terminal Guidelines
+- Format for adding shadcn/ui components:
+
+```
+npx shadcn@latest add <component-name>
+```
+- Commands should be escaped or in quotes if they contain special characters.
+
+# UI Guidelines
 - There should be a consistent color palette
 - There should be a consistent typography
   - Use Work Sans as the font family (https://fonts.google.com/specimen/Work+Sans)
