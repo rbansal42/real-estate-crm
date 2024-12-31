@@ -1,234 +1,259 @@
-# Cursor Agent Implementation Prompt
+Here's the prompt for the Cursor agent to implement the team page improvements:
 
-## Project Context
-Implement a Real Estate CRM with focus on lead management, team organization, and property listings. Follow modern web development practices using Next.js App Router and TypeScript.
+```markdown
+# Task: Implement Team Management Page Improvements
 
-## Implementation Guidelines
+## Overview
+Enhance the team management page with proper TypeScript types, error handling, loading states, and UI improvements.
 
-### Core Architecture
-- Follow directory structure as defined in crm.cursorrules (lines 9-19)
-- Implement features one at a time, completing all dependencies
-- Use atomic design principles for components
-- Use version control system to manage code. Follow principles of atomic commits.
-- Reference leads table implementation pattern:
+## Implementation Steps
 
-```28:181:src/components/leads/leads-data-table.tsx
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react"
-import { useLeadsData } from "@/hooks/use-leads-data"
-import { logger } from "@/lib/logger"
-import { DataTablePagination } from "@/components/ui/data-table-pagination"
-import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
-import { LeadDetailsDrawer } from "./lead-details-drawer"
-import { LEAD_STATUS_CONFIG, LeadStatus } from "@/lib/constants"
-import * as Icons from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { LoadingSpinner } from "@/components/ui/loading-spinner"
-import { LucideIcon } from 'lucide-react'
-import { Lead } from "@/hooks/use-leads-data"
-
-interface LeadsDataTableProps {
-  data: Lead[]
-}
-export function LeadsDataTable({ data }: LeadsDataTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = useState({})
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [leadToDelete, setLeadToDelete] = useState<string | null>(null)
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
-
-  const columns: ColumnDef<Lead>[] = [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-          className="border-primary/20 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      accessorKey: "name",
-      header: "Name",
-      cell: ({ row }) => (
-        <Button
-          variant="link"
-          className="p-0 h-auto font-normal text-primary hover:text-primary/90"
-          onClick={() => setSelectedLead(row.original)}
-        >
-          {row.getValue("name")}
-        </Button>
-      ),
-    },
-    {
-      accessorKey: "email",
-      header: "Email",
-    },
-    {
-      accessorKey: "phone",
-      header: "Phone",
-    },
-    {
-      accessorKey: "source",
-      header: "Source",
-    },
-    {
-      accessorKey: "status",
-      header: "Status",
-      cell: ({ row }) => {
-        const status = row.getValue("status") as LeadStatus
-        const config = LEAD_STATUS_CONFIG[status]
-        const IconComponent = Icons[config.icon as keyof typeof Icons] as LucideIcon
-        
-        return (
-          <div className="flex items-center gap-2">
-            <Badge className={`${config.color} ${config.textColor} flex items-center gap-1`}>
-              <IconComponent className="h-3 w-3" />
-              {status}
-            </Badge>
-          </div>
-        )
-      },
-    },
-    {
-      accessorKey: "assignedTo",
-      header: "Assigned To",
-    },
-    {
-      accessorKey: "createdAt",
-      header: "Created At",
-    },
-    {
-      id: "actions",
-      cell: ({ row }) => {
-        const lead = row.original
-
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-primary/5">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4 text-primary" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => handleEdit(lead.id)}>
-                <Pencil className="mr-2 h-4 w-4" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                className="text-red-600"
-                onClick={() => handleDeleteClick(lead.id)}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )
-      },
-    },
-  ]
-
-  const table = useReactTable({
-    data,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
-  })
+1. First, add required shadcn/ui components:
+```bash
+npx shadcn@latest add alert-dialog
+npx shadcn@latest add skeleton
+npx shadcn@latest add dropdown-menu
 ```
 
+2. Create the following type definitions in `src/lib/types/team.ts`:
+```typescript
+export interface TeamMember {
+  id: string
+  name: string
+  email: string
+  role: 'admin' | 'manager' | 'agent'
+  status: 'active' | 'inactive'
+  joinedAt: string
+  permissions: TeamPermissions
+  avatar?: string
+}
 
-### Design System Requirements
+export interface TeamMemberFormData {
+  name: string
+  email: string
+  role: TeamMember['role']
+  status: TeamMember['status']
+  permissions: TeamPermissions
+}
+
+export interface TeamPermissions {
+  manageTeam: boolean
+  manageLeads: boolean
+  manageProperties: boolean
+  viewReports: boolean
+  settings: boolean
+}
+
+export interface BulkActionPayload {
+  ids: string[]
+  data: Partial<TeamMember>
+}
+```
+
+3. Create the following components:
+
+a. `src/components/team/delete-confirmation-dialog.tsx`:
+```typescript
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { logger } from "@/lib/logger"
+
+interface DeleteConfirmationDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onConfirm: () => Promise<void>
+  isDeleting: boolean
+  count: number
+}
+
+export function DeleteConfirmationDialog({
+  open,
+  onOpenChange,
+  onConfirm,
+  isDeleting,
+  count
+}: DeleteConfirmationDialogProps) {
+  const handleConfirm = async () => {
+    logger.info("Confirming team member deletion", { count })
+    await onConfirm()
+  }
+
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. This will permanently delete {count === 1 ? 'this team member' : `${count} team members`} and remove their data from the server.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction 
+            onClick={handleConfirm}
+            disabled={isDeleting}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {isDeleting ? "Deleting..." : "Delete"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
+```
+
+b. `src/components/team/bulk-actions-dropdown.tsx`:
+```typescript
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
+import { MoreHorizontal, Trash, UserCheck, UserX, KeyRound } from "lucide-react"
+import { logger } from "@/lib/logger"
+
+interface BulkActionsDropdownProps {
+  selectedCount: number
+  onAction: (action: string) => void
+  disabled?: boolean
+}
+
+export function BulkActionsDropdown({
+  selectedCount,
+  onAction,
+  disabled
+}: BulkActionsDropdownProps) {
+  if (selectedCount === 0) return null
+
+  const handleAction = (action: string) => {
+    logger.info("Bulk action selected", { action, selectedCount })
+    onAction(action)
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" disabled={disabled}>
+          <MoreHorizontal className="h-4 w-4 mr-2" />
+          Bulk Actions ({selectedCount})
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onSelect={() => handleAction("activate")}>
+          <UserCheck className="h-4 w-4 mr-2" />
+          Activate
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => handleAction("deactivate")}>
+          <UserX className="h-4 w-4 mr-2" />
+          Deactivate
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => handleAction("reset-password")}>
+          <KeyRound className="h-4 w-4 mr-2" />
+          Reset Password
+        </DropdownMenuItem>
+        <DropdownMenuItem 
+          onSelect={() => handleAction("delete")}
+          className="text-destructive focus:text-destructive"
+        >
+          <Trash className="h-4 w-4 mr-2" />
+          Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+```
+
+4. Update the team page component at:
+```typescript:src/app/(dashboard)/team/page.tsx
+startLine: 1
+endLine: 256
+```
+
+5. Update the team data hook to include bulk actions:
+```typescript
+export function useTeamData() {
+  const queryClient = useQueryClient()
+  
+  const { data: team, isLoading } = useQuery({
+    queryKey: ['team'],
+    queryFn: fetchTeamMembers
+  })
+
+  const { mutate: addTeamMember, isPending: isAddingTeamMember } = useMutation({
+    mutationFn: createTeamMember,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['team'] })
+    }
+  })
+
+  const { mutate: updateTeamMember, isPending: isUpdatingTeamMember } = useMutation({
+    mutationFn: updateTeamMemberData,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['team'] })
+    }
+  })
+
+  const { mutate: deleteTeamMember, isPending: isDeletingTeamMember } = useMutation({
+    mutationFn: deleteTeamMemberData,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['team'] })
+    }
+  })
+
+  const { mutate: bulkDeleteTeamMembers, isPending: isBulkDeletingTeamMembers } = useMutation({
+    mutationFn: bulkDeleteTeamMembersData,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['team'] })
+    }
+  })
+
+  const { mutate: bulkUpdateTeamMembers, isPending: isBulkUpdatingTeamMembers } = useMutation({
+    mutationFn: bulkUpdateTeamMembersData,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['team'] })
+    }
+  })
+
+  return {
+    team,
+    isLoading,
+    addTeamMember,
+    updateTeamMember,
+    deleteTeamMember,
+    bulkDeleteTeamMembers,
+    bulkUpdateTeamMembers,
+    isAddingTeamMember,
+    isUpdatingTeamMember,
+    isDeletingTeamMember,
+    isBulkDeletingTeamMembers,
+    isBulkUpdatingTeamMembers
+  }
+}
+```
+
+## Requirements
+
+1. Follow TypeScript strict mode
+2. Use proper error boundaries
+3. Implement loading states for all operations
+4. Add confirmation for destructive actions
+5. Support bulk operations
+6. Log all important actions
+7. Follow the design system guidelines
+8. Use proper component composition
+9. Implement responsive design
+10. Follow accessibility guidelines
+
+## Reference Components
+```typescript:src/components/team/team-page-header.tsx
+startLine: 1
+endLine: 33
+```
+
+## Project Guidelines
+- Use onPress instead of onClick for custom components
 - Use shadcn/ui components
-- Implement Work Sans font family
-- Follow color system:
-  - Primary: indigo-500 (HSL)
-  - Secondary: blue-500 (HSL)
-  - Support light/dark themes
-- Use Lucide icons exclusively
+- Follow the color system (indigo-500 primary, blue-500 secondary)
+- Implement proper error handling
+- Add logging for all actions
+```
 
-### Development Standards
-1. **Component Development**
-   - Use `onPress` instead of `onClick`
-   - Implement loading states with skeletons
-   - Follow table requirements from .cursorrules (lines 45-56)
-   - Ensure mobile responsiveness
-
-2. **State Management**
-   - Use React Query for server state
-   - Implement context for global state
-   - Follow hooks pattern from leads implementation
-
-3. **Data Handling**
-   - Store dummy data in constants/dummyData/*
-   - Implement proper error boundaries
-   - Use logger for all events/actions
-
-### Version Control
-- Follow branch strategy from crm.cursorrules (lines 274-286)
-- Use atomic commits with conventional commit messages
-- Create feature branches: `feature/[ticket-number]-brief-description`
-
-### Quality Requirements
-- TypeScript strict mode enabled
-- ESLint rules followed
-- Accessibility compliance
-- Mobile-first responsive design
-
-## Implementation Order
-1. Setup project structure and dependencies
-2. Implement authentication system
-3. Build lead management feature
-4. Develop team management
-5. Create property management
-6. Add import functionality
-7. Implement reporting system
-
-## Dependencies to Verify
-- Next.js 13+
-- shadcn/ui
-- TanStack Query
-- Lucide React
-- Work Sans font
-- Required shadcn/ui components
-
-## Additional Notes
-- Reference existing implementation patterns in the codebase
-- Follow UX guidelines for destructive actions
-- Ensure all tables follow the defined pattern
-- Implement proper loading states
-- Use Next.js Image and Link components
-- Maintain consistent code organization and import order
-
-Would you like me to elaborate on any specific aspect of the implementation prompt?
+Would you like me to elaborate on any part of this implementation plan?

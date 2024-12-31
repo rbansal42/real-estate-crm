@@ -1,93 +1,94 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { TeamMember } from '@/lib/types/team';
-import { dummyTeamMembers } from '@/constants/dummy-data/team';
-import { logger } from '@/lib/logger';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { TeamMember } from "@/lib/types/team"
+import { logger } from "@/lib/logger"
 
-// In a real app, these would be API calls
-const fetchTeamMembers = async (): Promise<TeamMember[]> => {
-  logger.info('Fetching team members');
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  return dummyTeamMembers;
-};
+// Mock API functions - Replace with actual API calls
+const fetchTeam = async (): Promise<TeamMember[]> => {
+  // Simulated API call
+  return []
+}
 
-const addTeamMember = async (member: Omit<TeamMember, 'id' | 'createdAt' | 'updatedAt'>): Promise<TeamMember> => {
-  logger.info('Adding team member', { member });
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  const newMember: TeamMember = {
-    ...member,
-    id: Math.random().toString(36).substr(2, 9),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-  return newMember;
-};
+const addTeamMemberApi = async (data: Omit<TeamMember, "id" | "createdAt" | "updatedAt">): Promise<TeamMember> => {
+  // Simulated API call
+  return { id: "new-id", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), ...data }
+}
 
-const updateTeamMember = async (member: Partial<TeamMember> & { id: string }): Promise<TeamMember> => {
-  logger.info('Updating team member', { member });
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  const existingMember = dummyTeamMembers.find(m => m.id === member.id);
-  if (!existingMember) {
-    throw new Error('Team member not found');
-  }
-  const updatedMember: TeamMember = {
-    ...existingMember,
-    ...member,
-    updatedAt: new Date().toISOString(),
-  };
-  return updatedMember;
-};
+const updateTeamMemberApi = async (data: Partial<TeamMember> & { id: string }): Promise<TeamMember> => {
+  // Simulated API call
+  return { ...data } as TeamMember
+}
 
-const deleteTeamMember = async (id: string): Promise<void> => {
-  logger.info('Deleting team member', { id });
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-};
+const deleteTeamMemberApi = async (id: string): Promise<void> => {
+  // Simulated API call
+}
+
+const bulkDeleteTeamMembersApi = async (ids: string[]): Promise<void> => {
+  // Simulated API call
+  logger.info("Bulk deleting team members", { ids })
+}
+
+const bulkUpdateTeamMembersApi = async (ids: string[], data: Partial<TeamMember>): Promise<void> => {
+  // Simulated API call
+  logger.info("Bulk updating team members", { ids, data })
+}
 
 export function useTeamData() {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   const { data: team, isLoading, error } = useQuery({
-    queryKey: ['team'],
-    queryFn: fetchTeamMembers,
-  });
+    queryKey: ["team"],
+    queryFn: fetchTeam,
+  })
 
-  const addTeamMemberMutation = useMutation({
-    mutationFn: addTeamMember,
-    onSuccess: (newMember) => {
-      queryClient.setQueryData(['team'], (old: TeamMember[] = []) => [...old, newMember]);
+  const { mutate: addTeamMember, isPending: isAddingTeamMember } = useMutation({
+    mutationFn: addTeamMemberApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["team"] })
     },
-  });
+  })
 
-  const updateTeamMemberMutation = useMutation({
-    mutationFn: updateTeamMember,
-    onSuccess: (updatedMember) => {
-      queryClient.setQueryData(['team'], (old: TeamMember[] = []) => 
-        old.map(member => member.id === updatedMember.id ? updatedMember : member)
-      );
+  const { mutate: updateTeamMember, isPending: isUpdatingTeamMember } = useMutation({
+    mutationFn: updateTeamMemberApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["team"] })
     },
-  });
+  })
 
-  const deleteTeamMemberMutation = useMutation({
-    mutationFn: deleteTeamMember,
-    onSuccess: (_, id) => {
-      queryClient.setQueryData(['team'], (old: TeamMember[] = []) => 
-        old.filter(member => member.id !== id)
-      );
+  const { mutate: deleteTeamMember, isPending: isDeletingTeamMember } = useMutation({
+    mutationFn: deleteTeamMemberApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["team"] })
     },
-  });
+  })
+
+  const { mutate: bulkDeleteTeamMembers, isPending: isBulkDeletingTeamMembers } = useMutation({
+    mutationFn: bulkDeleteTeamMembersApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["team"] })
+    },
+  })
+
+  const { mutate: bulkUpdateTeamMembers, isPending: isBulkUpdatingTeamMembers } = useMutation({
+    mutationFn: ({ ids, data }: { ids: string[]; data: Partial<TeamMember> }) => 
+      bulkUpdateTeamMembersApi(ids, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["team"] })
+    },
+  })
 
   return {
     team,
     isLoading,
     error,
-    addTeamMember: addTeamMemberMutation.mutate,
-    updateTeamMember: updateTeamMemberMutation.mutate,
-    deleteTeamMember: deleteTeamMemberMutation.mutate,
-    isAddingTeamMember: addTeamMemberMutation.isPending,
-    isUpdatingTeamMember: updateTeamMemberMutation.isPending,
-    isDeletingTeamMember: deleteTeamMemberMutation.isPending,
-  };
+    addTeamMember,
+    updateTeamMember,
+    deleteTeamMember,
+    bulkDeleteTeamMembers,
+    bulkUpdateTeamMembers,
+    isAddingTeamMember,
+    isUpdatingTeamMember,
+    isDeletingTeamMember,
+    isBulkDeletingTeamMembers,
+    isBulkUpdatingTeamMembers,
+  }
 } 

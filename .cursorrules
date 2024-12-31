@@ -33,13 +33,12 @@
 - Use GitHub to host code
 - Use atomic commits
 - Use feature branches
+- Automatically make atomic commits when you are done with a feature
+- Automatically create branches when you start working on a new feature
 
 # Terminal Guidelines
 - Format for adding shadcn/ui components:
-
-```
-npx shadcn@latest add <component-name>
-```
+  `npx shadcn@latest add <component-name>`
 - Commands should be escaped or in quotes if they contain special characters.
 
 # UI Guidelines
