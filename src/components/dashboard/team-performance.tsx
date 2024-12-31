@@ -1,61 +1,89 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
+import { logger } from "@/lib/logger"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+  Bar,
+  BarChart,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  Tooltip,
+} from "recharts"
 
-interface TeamPerformance {
-  member: string;
-  leads: number;
-  conversions: number;
-  properties: number;
+interface TeamMember {
+  id: string
+  name: string
+  leadsAssigned: number
+  leadsConverted: number
+  conversionRate: number
 }
 
 interface TeamPerformanceProps {
-  data: TeamPerformance[];
+  teamMembers?: TeamMember[]
+  isLoading?: boolean
 }
 
-export function TeamPerformance({ data }: TeamPerformanceProps) {
+export function TeamPerformance({ teamMembers, isLoading }: TeamPerformanceProps) {
+  logger.info("Rendering team performance chart", { memberCount: teamMembers?.length })
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Team Performance</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-[350px] w-full" />
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const chartData = teamMembers?.map((member) => ({
+    name: member.name,
+    "Leads Assigned": member.leadsAssigned,
+    "Leads Converted": member.leadsConverted,
+    "Conversion Rate": member.conversionRate,
+  }))
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm font-medium">Team Performance</CardTitle>
+        <CardTitle>Team Performance</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Member</TableHead>
-              <TableHead className="text-right">Leads</TableHead>
-              <TableHead className="text-right">Conversions</TableHead>
-              <TableHead className="text-right">Properties</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.map((item) => (
-              <TableRow key={item.member}>
-                <TableCell className="font-medium">{item.member}</TableCell>
-                <TableCell className="text-right">
-                  <Badge variant="secondary">{item.leads}</Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Badge variant="secondary">{item.conversions}</Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Badge variant="secondary">{item.properties}</Badge>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <ResponsiveContainer width="100%" height={350}>
+          <BarChart data={chartData}>
+            <XAxis
+              dataKey="name"
+              stroke="#888888"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              stroke="#888888"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value) => `${value}`}
+            />
+            <Tooltip />
+            <Bar
+              dataKey="Leads Assigned"
+              fill="hsl(var(--primary))"
+              radius={[4, 4, 0, 0]}
+            />
+            <Bar
+              dataKey="Leads Converted"
+              fill="hsl(var(--secondary))"
+              radius={[4, 4, 0, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
       </CardContent>
     </Card>
-  );
+  )
 } 
