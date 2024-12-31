@@ -1,17 +1,13 @@
-import type { Metadata } from "next"
+"use client"
+
 import { Work_Sans } from "next/font/google"
-import "./globals.css"
 import { ThemeProvider } from "@/components/providers/theme-provider"
-import { QueryProvider } from "@/components/providers/query-provider"
+import { AuthProvider } from "@/components/providers/auth-provider"
 import { Toaster } from "@/components/ui/toaster"
-import ClientLayout from "./layout.client"
+import { cn } from "@/lib/utils"
+import "@/app/globals.css"
 
 const workSans = Work_Sans({ subsets: ["latin"] })
-
-export const metadata: Metadata = {
-  title: "PropDekho CRM",
-  description: "Real Estate CRM for managing leads, teams, and properties",
-}
 
 export default function RootLayout({
   children,
@@ -20,14 +16,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={workSans.className}>
-        <ThemeProvider>
-          <QueryProvider>
-            <ClientLayout>
-              {children}
-            </ClientLayout>
+      <head />
+      <body className={cn("min-h-screen bg-background antialiased", workSans.className)}>
+        <ThemeProvider
+          themes={["light", "dark", "system"]}
+          defaultTheme="system"
+          storageKey="propdekho-theme"
+        >
+          <AuthProvider>
+            {children}
             <Toaster />
-          </QueryProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

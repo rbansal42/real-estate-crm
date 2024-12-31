@@ -1,47 +1,34 @@
-type LogLevel = 'info' | 'warn' | 'error' | 'debug';
+const isDevelopment = process.env.NODE_ENV === 'development'
 
-interface LogMessage {
-  level: LogLevel;
-  message: string;
-  data?: Record<string, unknown>;
-  timestamp: string;
+type LogLevel = 'info' | 'warn' | 'error'
+
+interface LogOptions {
+  level: LogLevel
+  message: string
+  data?: any
 }
 
-class Logger {
-  private isDevelopment = process.env.NODE_ENV === 'development';
+function log({ level, message, data }: LogOptions) {
+  if (!isDevelopment) return
 
-  private formatMessage(level: LogLevel, message: string, data?: Record<string, unknown>): LogMessage {
-    return {
-      level,
-      message,
-      data,
-      timestamp: new Date().toISOString(),
-    };
-  }
+  const timestamp = new Date().toISOString()
+  const logData = data ? { ...data, timestamp } : { timestamp }
 
-  info(message: string, data?: Record<string, unknown>): void {
-    if (!this.isDevelopment) return;
-    const formattedMessage = this.formatMessage('info', message, data);
-    console.log(`[INFO] ${formattedMessage.timestamp}:`, message, data || '');
-  }
-
-  warn(message: string, data?: Record<string, unknown>): void {
-    if (!this.isDevelopment) return;
-    const formattedMessage = this.formatMessage('warn', message, data);
-    console.warn(`[WARN] ${formattedMessage.timestamp}:`, message, data || '');
-  }
-
-  error(message: string, data?: Record<string, unknown>): void {
-    if (!this.isDevelopment) return;
-    const formattedMessage = this.formatMessage('error', message, data);
-    console.error(`[ERROR] ${formattedMessage.timestamp}:`, message, data || '');
-  }
-
-  debug(message: string, data?: Record<string, unknown>): void {
-    if (!this.isDevelopment) return;
-    const formattedMessage = this.formatMessage('debug', message, data);
-    console.debug(`[DEBUG] ${formattedMessage.timestamp}:`, message, data || '');
+  switch (level) {
+    case 'info':
+      console.log(`[INFO] ${message}`, logData)
+      break
+    case 'warn':
+      console.warn(`[WARN] ${message}`, logData)
+      break
+    case 'error':
+      console.error(`[ERROR] ${message}`, logData)
+      break
   }
 }
 
-export const logger = new Logger(); 
+export const logger = {
+  info: (message: string, data?: any) => log({ level: 'info', message, data }),
+  warn: (message: string, data?: any) => log({ level: 'warn', message, data }),
+  error: (message: string, data?: any) => log({ level: 'error', message, data }),
+} 
