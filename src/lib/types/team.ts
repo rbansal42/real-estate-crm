@@ -1,60 +1,50 @@
-export type TeamMemberRole = 
-  | 'admin'
-  | 'manager'
-  | 'agent'
-  | 'support'
-  | 'viewer';
-
-export type TeamMemberStatus = 
-  | 'active'
-  | 'inactive'
-  | 'pending'
-  | 'blocked';
-
-export type TeamMemberDepartment = 
-  | 'sales'
-  | 'marketing'
-  | 'support'
-  | 'operations'
-  | 'management';
-
-export interface TeamMemberPermissions {
-  canManageTeam: boolean;
-  canManageLeads: boolean;
-  canManageProperties: boolean;
-  canViewReports: boolean;
-  canManageSettings: boolean;
-  canDeleteRecords: boolean;
-  canExportData: boolean;
-}
-
-export interface TeamMemberStats {
-  totalLeads: number;
-  activeLeads: number;
-  closedDeals: number;
-  conversionRate: number;
-  lastActivityAt?: string;
-}
-
 export interface TeamMember {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  role: TeamMemberRole;
-  department: TeamMemberDepartment;
-  status: TeamMemberStatus;
-  permissions: TeamMemberPermissions;
-  stats: TeamMemberStats;
-  avatar?: string;
-  title?: string;
-  bio?: string;
-  joinedAt: string;
-  lastLoginAt?: string;
-  createdAt: string;
-  updatedAt: string;
-  supervisor?: string;
-  subordinates?: string[];
-  tags?: string[];
-  notes?: string;
+  id: string
+  name: string
+  email: string
+  role: 'admin' | 'manager' | 'agent'
+  status: 'active' | 'inactive'
+  joinedAt: string
+  permissions: TeamPermissions
+  avatar?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface TeamMemberFormData {
+  name: string
+  email: string
+  role: TeamMember['role']
+  status: TeamMember['status']
+  permissions: TeamPermissions
+  joinedAt: string
+}
+
+export interface TeamPermissions {
+  manageTeam: boolean
+  manageLeads: boolean
+  manageProperties: boolean
+  viewReports: boolean
+  settings: boolean
+}
+
+export interface BulkActionPayload {
+  ids: string[]
+  data: Partial<TeamMember>
+}
+
+export type TeamRole = 'admin' | 'manager' | 'agent'
+export type TeamStatus = 'active' | 'inactive'
+
+export interface TeamTableFilters {
+  role?: TeamRole
+  status?: TeamStatus
+  search?: string
+}
+
+export interface BulkAction {
+  label: string
+  value: string
+  icon?: React.ComponentType<{ className?: string }>
+  destructive?: boolean
 } 
