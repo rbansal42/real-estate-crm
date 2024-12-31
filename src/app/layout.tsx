@@ -3,9 +3,10 @@
 import { Work_Sans } from "next/font/google"
 import { ThemeProvider } from "@/components/providers/theme-provider"
 import { AuthProvider } from "@/components/providers/auth-provider"
+import { QueryProvider } from "@/components/providers/query-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { cn } from "@/lib/utils"
-import "@/app/globals.css"
+import "@/styles/globals.css"
 
 const workSans = Work_Sans({ subsets: ["latin"] })
 
@@ -23,10 +24,12 @@ export default function RootLayout({
           defaultTheme="system"
           storageKey="propdekho-theme"
         >
-          <AuthProvider>
-            {children}
-            <Toaster />
-          </AuthProvider>
+          <QueryProvider>
+            <AuthProvider>
+              {children}
+              <Toaster />
+            </AuthProvider>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>
