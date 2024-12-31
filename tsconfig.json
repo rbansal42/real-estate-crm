@@ -25,7 +25,9 @@
       "@/hooks/*": ["./src/hooks/*"],
       "@/types/*": ["./src/lib/types/*"],
       "@/app/*": ["./src/app/*"],
-      "@/constants/*": ["./src/constants/*"]
+      "@/constants/*": ["./src/constants/*"],
+      "@/middleware/*": ["./src/middleware/*"],
+      "@/auth/*": ["./src/auth/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
