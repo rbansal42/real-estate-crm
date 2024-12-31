@@ -1,56 +1,73 @@
 "use client"
 
-import { Cross2Icon } from '@radix-ui/react-icons';
-import { Table } from '@tanstack/react-table';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { DataTableViewOptions } from '@/components/ui/data-table-view-options';
-import { Plus, UserPlus } from 'lucide-react';
-import { logger } from '@/lib/logger';
-import { TeamMember } from '@/lib/types/team';
+import { Table } from "@tanstack/react-table"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Search, X, UserPlus } from "lucide-react"
+import { DataTableViewOptions } from "@/components/ui/data-table-view-options"
+import { TeamMember } from "@/lib/types/team"
+import { logger } from "@/lib/logger"
 
 interface TeamTableToolbarProps {
-  table: Table<TeamMember>;
-  onAdd: () => void;
+  table: Table<TeamMember>
+  onAdd?: () => void
 }
 
 export function TeamTableToolbar({ table, onAdd }: TeamTableToolbarProps) {
-  const isFiltered = table.getState().columnFilters.length > 0;
+  const handleSearch = (term: string) => {
+    logger.info("Searching team members", { term })
+    table.getColumn("name")?.setFilterValue(term)
+  }
+
+  const handleResetFilters = () => {
+    logger.info("Resetting team filters")
+    table.resetColumnFilters()
+  }
+
+  const handleAdd = () => {
+    if (onAdd) {
+      logger.info("Opening add team member dialog")
+      onAdd()
+    }
+  }
 
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
-        <Input
-          placeholder="Filter team members..."
-          value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
-          onChange={(event) =>
-            table.getColumn('name')?.setFilterValue(event.target.value)
-          }
-          className="h-8 w-[150px] lg:w-[250px]"
-        />
-        {isFiltered && (
+        <div className="relative w-72">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search team members..."
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+            onChange={(event) => handleSearch(event.target.value)}
+            className="pl-8"
+          />
+        </div>
+        {table.getState().columnFilters.length > 0 && (
           <Button
             variant="ghost"
-            onClick={() => table.resetColumnFilters()}
+            onClick={handleResetFilters}
             className="h-8 px-2 lg:px-3"
           >
             Reset
-            <Cross2Icon className="ml-2 h-4 w-4" />
+            <X className="ml-2 h-4 w-4" />
           </Button>
         )}
       </div>
       <div className="flex items-center space-x-2">
-        <Button
-          variant="default"
-          size="sm"
-          className="h-8"
-          onClick={onAdd}
-        >
-          <UserPlus className="mr-2 h-4 w-4" />
-          Add Member
-        </Button>
+        {onAdd && (
+          <Button
+            variant="default"
+            size="sm"
+            className="h-8"
+            onClick={handleAdd}
+          >
+            <UserPlus className="mr-2 h-4 w-4" />
+            Add Member
+          </Button>
+        )}
         <DataTableViewOptions table={table} />
       </div>
     </div>
-  );
+  )
 } 
