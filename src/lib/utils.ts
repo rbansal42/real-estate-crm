@@ -13,15 +13,12 @@ export function formatDate(date: string | Date) {
   })
 }
 
-export function formatCurrency(amount: number, currency: string = 'INR', locale: string = 'en-IN') {
-  const formatter = new Intl.NumberFormat(locale, {
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency: currency,
-    minimumFractionDigits: 0,
+    currency: 'INR',
     maximumFractionDigits: 0,
-  });
-
-  return formatter.format(amount);
+  }).format(amount);
 }
 
 // Format large numbers in a readable way (e.g., 1.5M, 100K)
