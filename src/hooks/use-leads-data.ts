@@ -1,93 +1,74 @@
+'use client';
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Lead } from '@/lib/types/lead';
 import { dummyLeads } from '@/constants/dummy-data/leads';
-import { logger } from '@/lib/logger';
 
-// In a real app, these would be API calls
+// In a real application, these would be API calls
 const fetchLeads = async (): Promise<Lead[]> => {
-  logger.info('Fetching leads');
+  console.log('Fetching leads...');
   // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   return dummyLeads;
 };
 
-const addLead = async (lead: Omit<Lead, 'id' | 'createdAt' | 'updatedAt'>): Promise<Lead> => {
-  logger.info('Adding lead', { lead });
+const addLeadToServer = async (lead: Lead): Promise<Lead> => {
+  console.log('Adding lead:', lead);
   // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  const newLead: Lead = {
-    ...lead,
-    id: Math.random().toString(36).substr(2, 9),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-  return newLead;
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  return lead;
 };
 
-const updateLead = async (lead: Partial<Lead> & { id: string }): Promise<Lead> => {
-  logger.info('Updating lead', { lead });
+const updateLeadOnServer = async (lead: Lead): Promise<Lead> => {
+  console.log('Updating lead:', lead);
   // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  const existingLead = dummyLeads.find((l: Lead) => l.id === lead.id);
-  if (!existingLead) {
-    throw new Error('Lead not found');
-  }
-  const updatedLead: Lead = {
-    ...existingLead,
-    ...lead,
-    updatedAt: new Date().toISOString(),
-  };
-  return updatedLead;
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  return lead;
 };
 
-const deleteLead = async (id: string): Promise<void> => {
-  logger.info('Deleting lead', { id });
+const deleteLeadFromServer = async (id: string): Promise<void> => {
+  console.log('Deleting lead:', id);
   // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 };
 
 export function useLeadsData() {
   const queryClient = useQueryClient();
 
-  const { data: leads, isLoading, error } = useQuery({
+  const { data, isLoading } = useQuery<Lead[]>({
     queryKey: ['leads'],
     queryFn: fetchLeads,
   });
 
-  const addLeadMutation = useMutation({
-    mutationFn: addLead,
-    onSuccess: (newLead) => {
-      queryClient.setQueryData(['leads'], (old: Lead[] = []) => [...old, newLead]);
+  const addMutation = useMutation({
+    mutationFn: addLeadToServer,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leads'] });
     },
   });
 
-  const updateLeadMutation = useMutation({
-    mutationFn: updateLead,
-    onSuccess: (updatedLead) => {
-      queryClient.setQueryData(['leads'], (old: Lead[] = []) => 
-        old.map(lead => lead.id === updatedLead.id ? updatedLead : lead)
-      );
+  const updateMutation = useMutation({
+    mutationFn: updateLeadOnServer,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leads'] });
     },
   });
 
-  const deleteLeadMutation = useMutation({
-    mutationFn: deleteLead,
-    onSuccess: (_, id) => {
-      queryClient.setQueryData(['leads'], (old: Lead[] = []) => 
-        old.filter(lead => lead.id !== id)
-      );
+  const deleteMutation = useMutation({
+    mutationFn: deleteLeadFromServer,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leads'] });
     },
   });
 
   return {
-    leads,
+    data,
     isLoading,
-    error,
-    addLead: addLeadMutation.mutate,
-    updateLead: updateLeadMutation.mutate,
-    deleteLead: deleteLeadMutation.mutate,
-    isAddingLead: addLeadMutation.isPending,
-    isUpdatingLead: updateLeadMutation.isPending,
-    isDeletingLead: deleteLeadMutation.isPending,
+    addLead: addMutation.mutateAsync,
+    updateLead: updateMutation.mutateAsync,
+    deleteLead: deleteMutation.mutateAsync,
+    isAddingLead: addMutation.isPending,
+    isUpdatingLead: updateMutation.isPending,
+    isDeletingLead: deleteMutation.isPending,
   };
 } 
